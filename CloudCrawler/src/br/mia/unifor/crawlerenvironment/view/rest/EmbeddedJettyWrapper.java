@@ -50,11 +50,13 @@ public class EmbeddedJettyWrapper {
 		Handler webAppHandler = getWebApp();
 		
 		HandlerList handlers = new HandlerList();
-        handlers.setHandlers(new Handler[] { jerseyHandler, webAppHandler });
+        	handlers.setHandlers(new Handler[] { jerseyHandler, webAppHandler });
         
-        server.setHandler(handlers);
+        	server.setHandler(handlers);
+
+		logger.info("http://" + properties.getProperty("host") + ":" + properties.getProperty("port") + "/CloudCrawler");
 		
-        server.start();
+        	server.start();
 		//server.join();
 	}
 	
