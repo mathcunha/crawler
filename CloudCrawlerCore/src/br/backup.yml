@@ -1,0 +1,58 @@
+!benchmark
+name: bench_1
+rounds: 3
+interval: 5000
+resultEndPoint: http://localhost:8080/OlioTestAnaliserWeb/servico/Execution
+
+providers:
+ - &rackspace !provider
+    credentialPath: Rackspace.properties
+    
+
+virtualMachines:
+ - &web !virtualMachine 
+   id: 7HJ38K
+   type: &flavor_2 !virtualMachineType
+    providerProfile: 2
+    provider: *rackspace
+   components:
+    - &apache !component
+       id: 1
+       onStartup: 
+         - &apacheConfig !scriptlet
+            id: 1
+            scripts:
+              - db.sh ${database.privateIP}
+
+ - &database !virtualMachine
+   id: YH838K
+   type: *flavor_2   
+   components:
+    - &postgres !component
+       id: 2
+       
+scenarios:
+  - !scenario
+    id: 1
+    workloads:     
+     - &low !workload
+        id: 1
+        values: 25,50,75,100,125,150
+   
+     - &moderate !workload
+       id: 2
+       values: 200,300,400,500,600,700
+            
+    metrics:
+     - &responseTime !metric    
+       sla: 90
+       
+    application: &wiki_3_vm !br.mia.unifor.olio.artifact.OlioApplication
+      database: *database
+      web: 
+       - *web
+       - &web2 !virtualMachine
+           id: 8GJ38K
+           type: *flavor_2   
+           components:
+             - *apache

@@ -1,0 +1,10 @@
+!result
+ metrics:
+  - !metricEval
+   workload: WORKLOAD
+   metric: !metric
+    name: ops/s
+   collectedMetrics:
+    - !collectedMetrics
+     value: VALUE
+     timestamp: TIMESTAMP

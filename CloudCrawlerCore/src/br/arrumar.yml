@@ -1,0 +1,138 @@
+!test
+beginHour: 21
+beginMinute: 30
+interval: 5000
+round: 3
+className: br.unifor.ow2.autoolio.OlioTest
+
+providers:
+ - &dummyProvider !provider
+    name: dummy
+    credentialPath: /br/dummy.properties
+    
+ - &ec2 !provider
+    name: aws-ec2
+    credentialPath: /br/AwsCredentials.properties
+    userName: 
+    privateKey:
+    
+ - &rackspace !provider
+    name: cloudservers-us
+    credentialPath: /br/RackspaceCredentials.properties
+    userName: 
+    privateKey:
+
+instanceTypes:
+ - &rackspace_low !instanceType
+    cpu: 8
+    ram: 4096
+    provider: *rackspace
+     
+ - &c1_xlarge !instanceType
+    cpu: 8
+    ram: 4096
+    providerProfile: 
+    provider: *ec2
+    
+    
+ - &c1_medium !instanceType
+    cpu: 4
+    ram: 256
+    provider: *ec2
+    
+    
+ - &m1_large !instanceType
+    cpu: 4
+    ram: 256
+    provider: *ec2
+    
+ - &m1_xlarge !instanceType
+    cpu: 6
+    ram: 9056    
+    provider: *ec2
+    
+ - &dummy !instanceType
+    cpu: 6
+    ram: 9056    
+    provider: *dummyProvider
+    
+metrics: 
+ - &responseTime !metric
+    probe: nomedaclasse
+    sla: 50, 90
+    
+ - &messagesPerSecond !metric
+    probe: nomedaclasse
+    sla: 80
+
+instanceTypeCapacityLevels:
+ - !instanceTypeClass
+    id: memoria
+    instanceTypes: 
+     - *c1_xlarge
+     - *c1_medium
+    
+ - !instanceTypeClass
+    id: 2
+    instanceTypes:
+     - *m1_xlarge
+     - *m1_large
+    
+instances:
+ - &inst_3 !instance
+   id: 20138561
+   type: *rackspace_low
+   name: MYSQL
+   
+ - &inst_1 !instance
+   id: us-east-1/i-f76fb79b
+   type: *c1_xlarge
+   name: DRIVER
+   
+ - &inst_2 !instance
+   id: us-east-1/i-3773085b
+   type: *c1_xlarge
+   name: MYSQL
+  
+workloads:
+ - &low !workload
+   id: 1
+   values: 
+    - 25
+    - 50
+    - 75
+    - 100 
+    - 125
+    - 150
+   
+ - &medium !workload
+   id: 2
+   values: 
+    - 200
+    - 250
+    - 300
+    - 350
+    - 400
+    - 450
+    - 500
+   
+ - &high !workload
+   id: 3
+   values: 
+   - 600
+   - 700
+   - 800
+   - 900
+   - 1000 
+
+   
+scenarios:
+ - !scenario
+  id: 1
+  instances:
+   - *inst_1
+   - *inst_2
+   - !instance
+    id: us-east-1/i-87843fd
+    type: *c1_xlarge
+    name: MYSQL

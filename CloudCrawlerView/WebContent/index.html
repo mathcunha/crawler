@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+Design by Free CSS Templates
+http://www.freecsstemplates.org
+Released for free under a Creative Commons Attribution 2.5 License
+
+Name       : Murky Stairwell 
+Description: A two-column, fixed-width design with dark color scheme.
+Version    : 1.0
+Released   : 20130405
+
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>CloudCrawler - Test as a Service</title>
+<link href='http://fonts.googleapis.com/css?family=Archivo+Narrow:400,700|Open+Sans:400,300' rel='stylesheet' type='text/css'>
+<link href="style.css" rel="stylesheet" type="text/css" media="screen" />
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=css&skin=sunburst"></script>
+<!-- Atmosphere -->
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="jquery/jquery.atmosphere.js"></script>
+<script type="text/javascript">
+
+function loadPage(pageName, id){
+	
+	$('#content_body').load(pageName)
+	
+	$( "li" ).each(function( index ) {
+		if(index == id){
+			$( this ).removeClass( "current_page_item" );
+		  	$( this ).toggleClass( "current_page_item" );
+		}else{
+			$( this ).removeClass( "current_page_item" );
+		}
+	});
+	
+} 
+
+$(document).ready(function() { // this runs as soon as the page is ready (DOM is loaded)
+	
+   loadPage('home.html',0)
+});
+</script>
+</head>
+<body>
+<div id="wrapper">
+	<div id="header-wrapper">
+		<div id="header" class="container">
+			<div id="logo">
+				<h1><a href="#">CloudCrawler</a></h1>
+			</div>
+			<div id="menu">
+				<ul id="menuList">
+					<li><a href="#" onclick="javascript:loadPage('home.html',0)">Home</a></li>
+					<li><a href="#" onclick="javascript:loadPage('pub.html',1)">Pubs</a></li>
+					<li><a href="#">Guide</a></li>
+					<li><a href="#" onclick="javascript:loadPage('log.html',3)">Log</a></li>
+					<li><a href="mailto:mathcunha@gmail.com">Contact</a></li>
+				</ul>
+			</div>
+		</div>
+		<div id="banner">
+			<div class="content"><img src="images/banner-img.jpg" width="1000" height="280" alt="" /></div>
+		</div>
+	</div>
+	<!-- end #header -->
+	
+	<div id="page">
+		<div id="content_body">
+		</div>
+		<!-- end #content -->
+		
+		
+		<div style="clear: both;">&nbsp;</div>
+	</div>
+	<!-- end #page --> 
+</div>
+<div id="footer">
+	<p>Copyright (c) 2013 Sitename.com. All rights reserved. Design by <a href="http://www.freecsstemplates.org">FCT</a>. Photos by <a href="http://fotogrph.com/">Fotogrph</a>.</p>
+</div>
+<!-- end #footer -->
+</body>
+</html>

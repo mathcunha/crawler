@@ -1,0 +1,31 @@
+<div id="content">
+			<div class="post">
+				<h2 class="title"><a href="#">About Cloud Crawler</a></h2>
+				<p class="meta"><span class="date">April 25, 2013</span><span class="posted">Posted by <a href="#">Matheus Cunha</a></span></p>
+				<div style="clear: both;">&nbsp;</div>
+				<div class="entry"><img src="images/cloudcrawler-overview.png" width="100%" alt="" /></div>
+				<div class="entry">
+					<p><strong>Cloud Crawler</strong> is a environment that automates the task of executing and evaluating the performance of IaaS cloud applications considering different resource types and different evaluation criteria. The environment includes a new declarative language, called Crawl, to specify the cloud application evaluation scenarios, and an execution engine, called Crawler, which executes the scenarios specified in Crawl and generates, as a result, a map of the application performance for the different cloud resource types evaluated. The use of the proposed environment is illustrated through an evaluation of the performance of a social network application in two commercial clouds.</p>
+					<p class="links"><a href="#" class="more">Read More</a></p>					
+				</div>
+			</div>
+			<div class="post">
+				<h2 class="title"><a href="#">Cloud Crawler Users</a></h2>
+				<p class="meta"><span class="date">April 25, 2013</span><span class="posted">Posted by <a href="#">Matheus Cunha</a></span></p>
+				<div style="clear: both;">&nbsp;</div>
+				<div class="entry">
+					<p>Sed lacus. Donec lectus. Nullam pretium nibh ut turpis. Nam bibendum. In nulla tortor, elementum vel, tempor at, varius non, purus. Mauris vitae nisl nec metus placerat consectetuer. Donec ipsum. Proin imperdiet est. Phasellus <a href="#">dapibus semper urna</a>. Pellentesque ornare, orci in consectetuer hendrerit, urna elit eleifend nunc, ut consectetuer nisl felis ac diam. Etiam non felis. Donec ut ante. In id eros. Suspendisse lacus turpis, cursus egestas at sem.  Mauris quam enim, molestie in,  ut, lobortis a, est.</p>
+					<p class="links"><a href="#" class="more">Read More</a><a href="#" title="b0x" class="comments">Comments</a></p>
+				</div>
+			</div>
+			<div class="post">
+				<h2 class="title"><a href="#">Cloud Crawler Architecture</a></h2>
+				<p class="meta"><span class="date">April 25, 2013</span><span class="posted">Posted by <a href="#">Matheus Cunha</a></span></p>
+				<div style="clear: both;">&nbsp;</div>
+				<div class="entry">
+					<p>The current version of the engine is implemented in Java, in the form of a RESTful web service that can be easily configured and deployed to run on any private or public cloud infrastructure. Its software architecture is composed of four modules, namely Engine, Parser, Builder and Executer, as shown in below figure. The Engine responds to user requests and coordinates the actions of the other modules. The Parser interprets and validates the Crawl specifications provided by the users, converting them to an internal and more compact Java representation used by the other modules. The Builder prepares the application's virtual resources in the cloud according to the needs of each scenario. Whenever possible, the Builder attempts to reuse an existing cloud resource (e.g., by re-starting a virtual machine that has been shutdown with a new hardware configuration) instead of requesting the creation of a new one from the cloud provider. This reuse strategy was designed to reduce the preparation time for each scenario and also as a mechanism to cut down cloud operational costs. Finally, the Executer starts and monitors the execution of each scenario in the cloud, using the resources prepared by the Builder, and collects and stores their evaluations results. After all evaluation scenarios have been successfully completed, the Engine consolidates the evaluation data collected by the Executer in the form of spreadsheets and returns them to the user.</p>					
+				</div>
+				<div class="entry"><img src="images/cloudcrawler-architecture.png" width="100%" alt="" /></div>
+			</div>
+			<div style="clear: both;">&nbsp;</div>
+		</div>

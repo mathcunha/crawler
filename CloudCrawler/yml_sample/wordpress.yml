@@ -1,0 +1,65 @@
+!benchmark
+id: 1
+name: specjvm2008
+rounds: 3
+interval: 5000
+resultEndPoint: http://ce3.herokuapp.com/api/v1/results
+
+providers:
+#Os provedores de nuvem utilizados
+providers:
+ - &ec2 !provider
+    name: aws-ec2
+    credentialPath: AwsCredentials.properties
+ - &local !provider
+     name: local
+     credentialPath: Local.properties
+    
+#tipos de instancia oferecidas pelo provedores de nuvem
+virtualMachineTypes:    
+ - &t1_micro !virtualMachineType
+    providerProfile: t1.micro
+    provider: *ec2
+ - &micro !virtualMachineType
+    provider: *local
+
+properties:
+ - &chef_script_wordpress !scriptlet
+     scripts:
+      - "knife ec2 server create --availability-zone us-east-1a --node-name ${name} --flavor ${type.providerProfile} --image ${image} --run-list \"role[wordpress-role]\" --ssh-user ${type.provider.userName} --ssh-key chef  --identity-file chef.pem  -c knife.rb"
+   
+virtualMachines:
+ - &wordpress !virtualMachine
+   id: 1
+   type: *t1_micro
+   name: wordpress
+   image: us-east-1/ami-7ea24a17
+   
+ - &jvmSpec !virtualMachine
+   id: 2
+   type: *t1_micro
+   image: us-east-1/ami-7ea24a17   
+   name: jvmspec
+   create: 
+    - *chef_script_wordpress
+   
+scenarios:
+  - !scenario
+    id: 1
+    workload: !workload 
+     targets:
+      - *jvmSpec
+     functions:
+      - !workloadFunction
+       values: compress
+   
+    metrics:
+     - &responseTime !metric
+      id: 3
+      name: compress ops/s
+      targets:
+       - *jvmSpec
+       
+    application: &specjvm2008 !application
+      virtualMachines: 
+       - *jvmSpec

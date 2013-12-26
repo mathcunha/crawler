@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+Design by Free CSS Templates
+http://www.freecsstemplates.org
+Released for free under a Creative Commons Attribution 2.5 License
+
+Name       : Murky Stairwell 
+Description: A two-column, fixed-width design with dark color scheme.
+Version    : 1.0
+Released   : 20130405
+
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>CloudCrawler - Test as a Service</title>
+<link
+	href='http://fonts.googleapis.com/css?family=Archivo+Narrow:400,700|Open+Sans:400,300'
+	rel='stylesheet' type='text/css'>
+	<link href="style.css" rel="stylesheet" type="text/css" media="screen" />
+	
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=css&skin=sunburst"></script>
+<!-- Atmosphere -->
+<script type="text/javascript" src="jquery/jquery-1.9.0.js"></script>
+<script type="text/javascript" src="jquery/jquery.atmosphere.js"></script>
+<!-- Application -->
+<script type="text/javascript" src="jquery/log.js"></script>
+	<script type="text/javascript">
+		function addMessage(message) {			
+			alert($('#content_web').html())
+			return true;
+		}
+
+		$(document).ready(function() { // this runs as soon as the page is ready (DOM is loaded)
+
+			$('#content_body').load('home.html')
+		});
+	</script>
+</head>
+<body>
+	<div id="content">
+		<div class="post">
+			<h2 class="title">
+				Console Output<a href="#"></a>
+			</h2>
+			<p class="meta">
+				<span class="date">Now</span><span class="posted" id="status">Updates every 5s</span>
+			</p>
+			<div style="clear: both;">&nbsp;</div>
+			<div class="entry" id="entry_div">
+				<pre class="prettyprint" id="content_web">
+{"message":"Hello World","author":"John Doe"}
+        		</pre>
+			</div>
+			<div id="header"> </div>
+			<p class="links">
+				<a href="#"
+					onclick="javascript:addMessage('<p>uximama uximama uximama.</p>')"
+					class="more">Read More</a><a href="#" title="b0x" class="comments">Comments</a>
+			</p>
+		</div>
+		
+		<div style="clear: both;">&nbsp;</div>
+	</div>
+
+</body>
+</html>

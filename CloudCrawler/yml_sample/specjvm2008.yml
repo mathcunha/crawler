@@ -1,0 +1,55 @@
+!benchmark
+id: 1
+name: specjvm2008
+rounds: 3
+interval: 5000
+resultEndPoint: http://ce3.herokuapp.com/api/v1/results
+
+providers:
+#Os provedores de nuvem utilizados
+providers:
+ - &ec2 !provider
+    name: aws-ec2
+    credentialPath: /home/vagrant/filestore/AwsCredentials.properties
+ - &local !provider
+     name: local
+     credentialPath: /home/vagrant/filestore/Local.properties
+    
+#tipos de instancia oferecidas pelo provedores de nuvem
+virtualMachineTypes:    
+ - &t1_micro !virtualMachineType
+    providerProfile: t1.micro
+    provider: *ec2
+ - &micro !virtualMachineType
+     provider: *local
+
+virtualMachines:
+ - &jvmSpec !virtualMachine 
+   id: us-east-1/i-397bb84b
+   type: *micro
+   publicIpAddress: 192.168.33.10
+   onStartup: 
+    - !scriptlet
+      scripts:
+       - "ls -lah"
+       
+scenarios:
+  - !scenario
+    id: 1
+    workload: !workload 
+     targets:
+      - *jvmSpec
+     functions:
+      - !workloadFunction
+       values: compress
+   
+    metrics:
+     - &responseTime !metric
+      id: 3
+      name: compress ops/s
+      targets:
+       - *jvmSpec
+       
+    application: &specjvm2008 !application
+      virtualMachines: 
+       - *jvmSpec

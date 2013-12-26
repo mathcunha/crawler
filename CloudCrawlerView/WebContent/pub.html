@@ -1,0 +1,30 @@
+<div id="content">
+            <div class="post">
+				<h2 class="title"><a href="#">A Declarative Environment for Automatic Performance Evaluation in IaaS Clouds</a></h2>
+				<p class="meta"><span class="posted">IEEE 6th International Conference on Cloud Computing</span></p>
+				<div style="clear: both;">&nbsp;</div>
+				<div class="entry">
+					<p>One of the main challenges faced by users of infrastructure-as-a-service (IaaS) clouds is the difficulty to adequately estimate the virtual resources necessary to their applications. Although many cloud providers offer programatic ways to rapidly acquire and release resources, it is important that users have a prior understanding of the impact that each virtual resource type offered by the provider may impose on application performance. This paper presents Cloud Crawler, a new declarative environment aimed at supporting users in describing and automatically executing application performance tests in IaaS clouds. To this end, the environment provides a novel declarative language, called Crawl, which supports the description of a variety of performance evaluation scenarios in multiple IaaS clouds; and an extensible Java-based cloud execution engine, called Crawler, which automatically configures, executes and collects the results of each performance evaluation scenario described in Crawl. To illustrate Cloud Crawler's potential benefits, the paper reports on an experimental evaluation of a social network application in two public IaaS cloud providers, in which the proposed environment has successfully been used to investigate the application performance for different virtual machine configurations and under different demand levels.</p>
+					<p class="links"><a href="#" class="more">Download</a><a href="#" title="b0x" class="comments">BibTex</a></p>
+				</div>
+			</div>
+			<div class="post">
+				<h2 class="title"><a href="#">Cloud Crawler: Um Ambiente Program&aacute;vel para Avaliar o Desempenho de Aplica&ccedil;&otilde;es em Nuvens de Infraestrutura</a></h2>
+				<p class="meta"><span class="posted">31o Simp&oacute;sio Brasileiro de Redes de Computadores e Sistemas Distribu&iacute;dos</p>
+				<div style="clear: both;">&nbsp;</div>				
+				<div class="entry">
+					<p>One of the main challenges faced by users of infrastructure-as-aservice (IaaS) clouds is the difficulty to adequately estimate the virtual resources necessary to their applications. Although many cloud providers offer fast ways to acquire and release resources, it is important that users have a prior understanding of the impact that each virtual resource type offered by the provider may impose on the performance of their applications. This work presents a new programmable environment to support users in automatically executing application performance tests in IaaS clouds. The environment, called Cloud Crawler, includes the Crawl declarative language, used to describe different performance evaluation scenarios for a given cloud application, and the Crawler execution engine, which executes the evaluation scenarios described in Crawl and collects their results. The use of the environment is illustrated through an evaluation of the performance of a social network application, using several virtual resources types under varying demand levels, in two commercial IaaS providers.</p>
+					<p class="links"><a href="#" class="more">Download</a><a href="#" title="b0x" class="comments">BibTex</a></p>					
+				</div>
+			</div>
+			<div class="post">
+				<h2 class="title"><a href="#">Cloud Crawler Architecture</a></h2>
+				<p class="meta"><span class="date">April 25, 2013</span><span class="posted">Posted by <a href="#">Matheus Cunha</a></span></p>
+				<div style="clear: both;">&nbsp;</div>
+				<div class="entry">
+					<p>The current version of the engine is implemented in Java, in the form of a RESTful web service that can be easily configured and deployed to run on any private or public cloud infrastructure. Its software architecture is composed of four modules, namely Engine, Parser, Builder and Executer, as shown in below figure. The Engine responds to user requests and coordinates the actions of the other modules. The Parser interprets and validates the Crawl specifications provided by the users, converting them to an internal and more compact Java representation used by the other modules. The Builder prepares the application's virtual resources in the cloud according to the needs of each scenario. Whenever possible, the Builder attempts to reuse an existing cloud resource (e.g., by re-starting a virtual machine that has been shutdown with a new hardware configuration) instead of requesting the creation of a new one from the cloud provider. This reuse strategy was designed to reduce the preparation time for each scenario and also as a mechanism to cut down cloud operational costs. Finally, the Executer starts and monitors the execution of each scenario in the cloud, using the resources prepared by the Builder, and collects and stores their evaluations results. After all evaluation scenarios have been successfully completed, the Engine consolidates the evaluation data collected by the Executer in the form of spreadsheets and returns them to the user.</p>					
+				</div>
+				<div class="entry"><img src="images/cloudcrawler-overview.png" width="100%" alt="" /></div>
+			</div>
+			<div style="clear: both;">&nbsp;</div>
+		</div>

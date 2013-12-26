@@ -1,0 +1,142 @@
+
+#Os provedores de nuvem utilizados
+providers:
+ - &dummyProvider !provider
+    name: dummy
+    credentialPath: /br/dummy.properties
+    
+ - &ec2 !provider
+    name: aws-ec2
+    credentialPath: /home/mathcunha/workspace/OnagaTest/src/br/AwsCredentials.properties
+    
+ - &rackspace !provider
+    name: cloudservers-us
+    credentialPath: /home/mathcunha/workspace/OnagaTest/src/br/RackspaceCredentials.properties
+    
+#tipos de instancia oferecidas pelo provedores de nuvem
+instanceTypes:
+ - &1_t1_micro !instanceType
+    providerProfile: 1
+    provider: *rackspace
+ - &2_m1_small !instanceType
+    providerProfile: 2
+    provider: *rackspace
+ - &3_m1_small !instanceType
+    providerProfile: 3
+    provider: *rackspace
+ - &4_c1_medium !instanceType
+    providerProfile: 4
+    provider: *rackspace
+ - &5_m1_large !instanceType
+    providerProfile: 5
+    provider: *rackspace
+ - &6_m1_xlarge !instanceType
+    providerProfile: 6
+    provider: *rackspace
+ - &7_m2_4xlarge !instanceType
+    providerProfile: 7
+    provider: *rackspace   
+     
+ - &t1_micro !instanceType
+    providerProfile: t1.micro
+    provider: *ec2
+    
+    
+ - &m1_small !instanceType
+    providerProfile: m1.small
+    provider: *ec2
+    
+ - &c1_medium !instanceType
+    providerProfile: c1.medium
+    provider: *ec2
+    
+ - &m1_large !instanceType
+    providerProfile: m1.large
+    provider: *ec2
+ 
+ - &m2_xlarge !instanceType
+    providerProfile: m2.xlarge
+    provider: *ec2
+    
+    
+ - &c1_xlarge !instanceType
+    providerProfile: c1.xlarge
+    provider: *ec2
+    
+ - &m1_xlarge !instanceType
+    providerProfile: m1.xlarge
+    provider: *ec2
+    
+ - &m2_2xlarge !instanceType
+    providerProfile: m2.2xlarge
+    provider: *ec2
+    
+ - &m2_4xlarge !instanceType
+    providerProfile: m2.4xlarge
+    provider: *ec2
+    
+ - &dummy !instanceType
+    cpu: 6
+    ram: 9056    
+    provider: *dummyProvider
+    
+metrics: 
+ - &responseTime !metric
+    probe: nomedaclasse
+    sla: 50, 90
+    
+ - &messagesPerSecond !metric
+    probe: nomedaclasse
+    sla: 80
+
+instanceTypeCapacityLevels:
+ - !instanceTypeCapacityLevel
+    id: 1
+    instanceTypes: 
+     - *c1_xlarge
+     - *c1_medium
+    
+ - !instanceTypeCapacityLevel
+    id: 2
+    instanceTypes:
+     - *m1_xlarge
+     - *m1_large
+
+scriptlets:
+ - &startup !scriptlet
+   id: 1
+   scripts:     
+     - /home/ubuntu/startup.sh
+ - &nginxScript !scriptlet
+      id: 2
+      scripts:
+        - /home/ubuntu/editNginx.sh ${type.properties(thinServers)}
+        - sudo sed -i 's/worker_processes.*$/worker_processes ${type.properties(workers)}; /' /etc/nginx/nginx.conf  
+ - &railsScript !scriptlet
+    id: 3
+    scripts:
+      - "sudo sed -i 's/host.*$/host: ${applianceScope.database.privateIpAddress} /' /var/app/olio/config/database.yml"   
+       
+    
+applications:
+ - &nginxApp !application
+   id: 1
+   config: 
+    - *nginxScript
+ - &mysqlApp !application
+   id: 2
+   onStartup: 
+    - *startup
+ - &fabanApp !application
+   id: 3
+   onStartup: 
+    - *startup
+ - &tomcatApp !application
+   id: 4
+   onStartup: 
+    - *startup
+ - &railsApp !application
+   id: 5
+   config: 
+    - *railsScript
+    
