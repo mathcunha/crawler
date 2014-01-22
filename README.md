@@ -20,8 +20,8 @@ After cloning the project, you will have a folder with the configuration to gene
 
 Once you have your box ready, it's time to configure your Java environment. So pick up your favorite jdk, set the JAVA_HOME and, inside the root folder of the project, execute the following commands:
 
-mvn package install
-cd CloudCrawler; mvn exec:java
+<p>mvn package install</p>
+<p>cd CloudCrawler; mvn exec:java</p>
 
 ## Usage
 This new version of the Cloud Crawler exposes a REST Api that is under development. I hope a new version is coming in this quarter
