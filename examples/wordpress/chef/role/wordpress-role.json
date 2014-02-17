@@ -1,0 +1,21 @@
+{
+  "name": "wordpress-role",
+  "description": "The base role for the Wordpress environment",
+  "json_class": "Chef::Role",
+  "default_attributes": {
+    "apache2": {
+      "listen_ports": [
+        "80",
+        "443"
+      ]
+    }
+  },
+  "override_attributes": {
+  },
+  "chef_type": "role",
+  "run_list": [
+    "recipe[wordpress::default]"
+  ],
+  "env_run_lists": {
+  }
+}
