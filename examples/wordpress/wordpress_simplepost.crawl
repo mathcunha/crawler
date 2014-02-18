@@ -1,0 +1,40 @@
+!benchmark
+id: 1
+name: SimplePost
+rounds: 3
+interval: 5000
+
+- !include
+  file: default.crawl
+  
+virtualMachines:
+ - &wordpress !virtualMachine
+   providerId: us-east-1/i-3gf4g
+   type: *m1_large
+   name: wordpress
+   image: us-east-1/ami-7ea24a17
+   
+ - &gatling !virtualMachine
+   providerId: us-east-1/i-5dfgf
+   type: *m1_small
+   image: us-east-1/ami-7ea24a17   
+   name: gatling
+   
+scenarios:
+  - !scenario
+    id: 1
+    workload: !workload 
+     targets:
+      - *gatling
+     functions:
+      - !workloadFunction
+       values: "10, 20, 30"
+   
+    metrics:
+     - &responseTime !metric
+      targets:
+       - *wordpress
+       
+    application: &wordpress !application
+      virtualMachines:
+       - *wordpress
