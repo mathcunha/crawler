@@ -1,0 +1,20 @@
+providers:
+#Os provedores de nuvem utilizados
+providers:
+ - &ec2 !provider
+    name: aws-ec2
+    credentialPath: AwsCredentials.properties
+
+#tipos de instancia oferecidas pelo provedores de nuvem
+virtualMachineTypes:    
+ - &m1_small !virtualMachineType
+    providerProfile: m1.small
+    provider: *ec2
+ - &m1_large !virtualMachineType
+    providerProfile: m1.large
+    provider: *ec2
+
+properties:
+ - &chef_script_wordpress !scriptlet
+     scripts:
+      - "knife ec2 server create --availability-zone us-east-1a --node-name ${name} --flavor ${type.providerProfile} --image ${image} --run-list \"role[wordpress-role]\" --ssh-user ${type.provider.userName} --ssh-key chef  --identity-file chef.pem  -c knife.rb"
