@@ -1,11 +1,9 @@
 package br.mia.unifor.crawler.executer.artifact;
 
-import java.util.List;
-
 public class Scenario extends CrawlerArtifact{
 	private Workload workload;
 	private Application application;
-	private List<Metric> metrics;
+	private Metric metric;
 	
 	
 	@Override
@@ -14,7 +12,7 @@ public class Scenario extends CrawlerArtifact{
 		
 		scenario.setWorkload(getWorkload());
 		scenario.setApplication(getApplication());
-		scenario.setMetrics(getMetrics());
+		scenario.setMetric(getMetric());
 		
 		return scenario;
 	}
@@ -24,12 +22,12 @@ public class Scenario extends CrawlerArtifact{
 	}
 
 
-	public void setMetrics(List<Metric> metrics) {
-		this.metrics = metrics;
+	public void setMetric(Metric metric) {
+		this.metric = metric;
 	}
 
-	public List<Metric> getMetrics() {
-		return metrics;
+	public Metric getMetric() {
+		return metric;
 	}
 
 	public void setApplication(Application application) {

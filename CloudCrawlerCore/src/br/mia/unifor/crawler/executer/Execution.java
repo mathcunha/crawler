@@ -13,13 +13,11 @@ import com.esotericsoftware.yamlbeans.YamlException;
 import br.mia.unifor.crawler.builder.ComputeProvider;
 import br.mia.unifor.crawler.executer.artifact.Benchmark;
 import br.mia.unifor.crawler.executer.artifact.Metric;
-import br.mia.unifor.crawler.executer.artifact.MetricEval;
 import br.mia.unifor.crawler.executer.artifact.Scenario;
 import br.mia.unifor.crawler.executer.artifact.Scriptlet;
 import br.mia.unifor.crawler.executer.artifact.VirtualMachine;
 import br.mia.unifor.crawler.executer.artifact.WorkloadFunction;
 import br.mia.unifor.crawler.executer.client.BenchmarkPartialResult;
-import br.mia.unifor.crawler.parser.YamlLoader;
 
 public class Execution {
 	protected static Logger logger = Logger
@@ -97,12 +95,11 @@ public class Execution {
 
 	}
 	
-	private static List<MetricEval> getResults(List<VirtualMachine> targets) throws YamlException {
-		Scriptlet script = new Scriptlet();
-		script.setScripts(Arrays.asList(new String[] { "~/results.sh" }));
+	private static void sendResults(List<VirtualMachine> targets) throws YamlException {
 		
 		StringBuffer buffer = new StringBuffer();
 		for (VirtualMachine target : targets) {
+			Scriptlet script = target.getScriptlet("result");
 			String targetResult = ComputeProvider.runScript(target, script,
 					target.getPublicIpAddress(), logger);
 			if (targetResult == null){
@@ -113,8 +110,7 @@ public class Execution {
 		}
 		
 		logger.info(buffer.toString());
-		
-		return YamlLoader.getMetricResult(buffer.toString()).getMetrics();
+				
 	}
 	
 	public static Boolean execTests(Scenario scenario, Benchmark benchmark,
@@ -124,14 +120,10 @@ public class Execution {
 
 		for (String workloadValue : workload.getValuesList()) {
 			
-			
-			for (Metric metrics : scenario.getMetrics()) {
-				for (VirtualMachine target : metrics.getTargets()){
-					startMetricCollection(target);
-				}
+			for (VirtualMachine target : scenario.getMetric().getTargets()){
+				startMetricCollection(target);
 			}
 			
-
 			for (VirtualMachine target : targets) {
 				sendWorkloadValue(target, workloadValue);
 			}
@@ -142,12 +134,10 @@ public class Execution {
 				}
 			}
 
-			List<MetricEval> results = getResults(targets);
+			sendResults(targets);
 			
-			for (Metric metrics : scenario.getMetrics()) {
-				for (VirtualMachine target : metrics.getTargets()){
-					stopMetricCollection(target);
-				}
+			for (VirtualMachine target : scenario.getMetric().getTargets()){
+				stopMetricCollection(target);
 			}
 			
 			BenchmarkPartialResult execution = new BenchmarkPartialResult();
@@ -160,7 +150,8 @@ public class Execution {
 
 			execution.setWorkload(workloadValue);
 
-			retorno |= persistResults(execution, results, benchmark);
+			//retorno |= persistResults(execution, results, benchmark);
+			retorno = Boolean.TRUE;
 
 			if (!retorno) {
 				logger.info("no successful execution for this workload");
@@ -170,19 +161,4 @@ public class Execution {
 
 		return retorno;
 	}
-	
-	private static Boolean persistResults(BenchmarkPartialResult execution,
-			List<MetricEval> results, Benchmark benchmark) {
-		Boolean passed = Boolean.TRUE;		
-
-		logger.info("results " + results);
-		execution.setMetricsEval(results);
-		execution.setSuccess(passed);
-
-		BenchmarkPartialResult.publishResult(execution,
-				benchmark.getResultEndPoint());
-
-		return passed;
-	}
-
 }

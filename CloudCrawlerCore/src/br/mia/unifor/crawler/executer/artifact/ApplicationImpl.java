@@ -2,7 +2,7 @@ package br.mia.unifor.crawler.executer.artifact;
 
 import java.util.List;
 
-public class ApplicationImpl implements Application {
+public class ApplicationImpl  extends CrawlerArtifact implements Application {
 	
 	private String description;
 	private List<VirtualMachine> virtualMachines;

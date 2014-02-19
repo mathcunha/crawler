@@ -8,9 +8,8 @@ public class VirtualMachine extends CrawlerArtifact{
 	private VirtualMachineType type;
 	private String name;
 	
-	private List<Scriptlet> create;
-	private List<Scriptlet> onStartup;
-	private List<Scriptlet> onShutdown;
+	private List<Scriptlet> scripts;	
+	
 	private List<Component> components;
 	
 	private Boolean temporary = false;
@@ -68,23 +67,7 @@ public class VirtualMachine extends CrawlerArtifact{
 
 	public String getPrivateIpAddress() {
 		return privateIpAddress;
-	}
-
-	public void setOnStartup(List<Scriptlet> onStartup) {
-		this.onStartup = onStartup;
-	}
-
-	public List<Scriptlet> getOnStartup() {
-		return onStartup;
-	}
-
-	public void setOnShutdown(List<Scriptlet> onShutdown) {
-		this.onShutdown = onShutdown;
-	}
-
-	public List<Scriptlet> getOnShutdown() {
-		return onShutdown;
-	}
+	}	
 
 	public void setComponents(List<Component> components) {
 		this.components = components;
@@ -92,15 +75,7 @@ public class VirtualMachine extends CrawlerArtifact{
 
 	public List<Component> getComponents() {
 		return components;
-	}
-
-	public List<Scriptlet> getCreate() {
-		return create;
-	}
-
-	public void setCreate(List<Scriptlet> create) {
-		this.create = create;
-	}
+	}	
 
 	public String getImage() {
 		return image;
@@ -124,5 +99,22 @@ public class VirtualMachine extends CrawlerArtifact{
 
 	public void setProviderId(String providerId) {
 		this.providerId = providerId;
-	}	
+	}
+
+	public List<Scriptlet> getScripts() {
+		return scripts;
+	}
+
+	public void setScripts(List<Scriptlet> scripts) {
+		this.scripts = scripts;
+	}
+	
+	public Scriptlet getScriptlet(String name){
+		for (Scriptlet scriptlet : getScripts()) {
+			if(name.equals(scriptlet.getName())){
+				return scriptlet;
+			}
+		}
+		return null;
+	}
 }

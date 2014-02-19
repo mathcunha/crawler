@@ -72,7 +72,7 @@ public abstract class ComputeProvider {
 
 		String ip = metadata.getPublicAddresses().iterator().next();
 
-		runScript(instance, instance.getOnShutdown(), ip, logger);
+		runScript(instance, instance.getScriptlet("shutdown"), ip, logger);
 		stopInstanceAction(instance);
 	}
 
@@ -101,10 +101,8 @@ public abstract class ComputeProvider {
 	public void createInstance(VirtualMachine instance, Application appliance){
 		List <Scriptlet> scriptlets = new ArrayList<Scriptlet>();
 		
-		if(instance.getCreate() != null && instance.getCreate().size() > 0){
-			for (Scriptlet scriptlet : instance.getCreate()) {
-				scriptlets.add(ScriptParser.parse(appliance, scriptlet, instance));
-			}
+		if(instance.getScriptlet("create") != null){
+			scriptlets.add(ScriptParser.parse(appliance, instance.getScriptlet("create"), instance));
 		}else{
 			try {
 				Set<? extends NodeMetadata> nodes = context.getComputeService().createNodesInGroup(instance.getName(), 1, getTemplate(instance.getType(), instance.getImage()));
@@ -182,16 +180,12 @@ public abstract class ComputeProvider {
 					}
 				}
 
-				if (instance.getOnStartup() != null) {
-					for (Scriptlet scriptlet : instance.getOnStartup()) {
-						scriptlets.add(ScriptParser.parse(appliance, scriptlet,
-								instance));
-					}
-				}
+				if (instance.getScriptlet("startup") != null) {
+					Scriptlet scriptlet = instance.getScriptlet("startup"); 
+					scriptlets.add(ScriptParser.parse(appliance, scriptlet, instance));
+				}				
 
-				instance.setOnStartup(scriptlets);
-
-				runScript(instance, instance.getOnStartup(), ip, logger);
+				runScript(instance, scriptlets, ip, logger);
 			}
 
 		} else {

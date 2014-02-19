@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-import java.util.List;
 
 import br.mia.unifor.crawler.executer.artifact.Application;
 import br.mia.unifor.crawler.executer.artifact.ApplicationImpl;
@@ -12,9 +11,7 @@ import br.mia.unifor.crawler.executer.artifact.Benchmark;
 import br.mia.unifor.crawler.executer.artifact.Component;
 import br.mia.unifor.crawler.executer.artifact.InstanceTypeCapacityLevels;
 import br.mia.unifor.crawler.executer.artifact.Metric;
-import br.mia.unifor.crawler.executer.artifact.MetricEval;
 import br.mia.unifor.crawler.executer.artifact.Provider;
-import br.mia.unifor.crawler.executer.artifact.Result;
 import br.mia.unifor.crawler.executer.artifact.Scenario;
 import br.mia.unifor.crawler.executer.artifact.Scriptlet;
 import br.mia.unifor.crawler.executer.artifact.VirtualMachine;
@@ -52,18 +49,7 @@ public class YamlLoader {
 		Benchmark test = (Benchmark) reader.read();
 		
 		return test;
-	}
-	
-	public static Result getMetricResult(String result) throws YamlException{
-		YamlReader reader = new YamlReader(result);
-		reader.getConfig().setClassTag("result",Result.class);
-		reader.getConfig().setClassTag("metric",Metric.class);
-		reader.getConfig().setClassTag("metricEval",MetricEval.class);
-		reader.getConfig().setClassTag("collectedMetrics",MetricEval.CollectedMetric.class);
-		
-		
-		return (Result) reader.read();
-	}
+	}	
 	
 	public static String getYaml(Object obj) {
 		StringWriter strWriter = new StringWriter();
@@ -76,27 +62,5 @@ public class YamlLoader {
 		}
 		
 		return strWriter.getBuffer().toString();
-	}
-	
-	public static void main(String[] args) {
-		try {
-			
-			Benchmark test = loadTest(YamlLoader.class.getClass().getResourceAsStream(
-			"/br/template.yml"));
-			
-			Application appliance = test.getScenarios().get(0).getApplication();
-			
-			VirtualMachine instance = appliance.getVirtualMachines().get(2);
-			
-			ScriptParser.parse(appliance, instance.getOnStartup().get(0), instance);
-			
-			System.out.println(test);
-			
-			
-		} catch (YamlException e) {			
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 }

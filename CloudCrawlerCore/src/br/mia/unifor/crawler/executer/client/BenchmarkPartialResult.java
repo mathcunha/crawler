@@ -19,7 +19,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import br.mia.unifor.crawler.executer.artifact.Benchmark;
-import br.mia.unifor.crawler.executer.artifact.MetricEval;
 import br.mia.unifor.crawler.executer.artifact.Scenario;
 
 public class BenchmarkPartialResult {
@@ -30,8 +29,7 @@ public class BenchmarkPartialResult {
 	private Boolean success;
 	private Long when;
 	private String workload;
-	private Scenario scenario;
-	private List<MetricEval> metricsEval;
+	private Scenario scenario;	
 
 	public String getDescription() {
 		return description;
@@ -123,15 +121,7 @@ public class BenchmarkPartialResult {
 		is.close();
 		return sb.toString();
 	}
-
-	public List<MetricEval> getMetricsEval() {
-		return metricsEval;
-	}
-
-	public void setMetricsEval(List<MetricEval> metricsEval) {
-		this.metricsEval = metricsEval;
-	}
-
+	
 	public Benchmark getBenchmark() {
 		return benchmark;
 	}
