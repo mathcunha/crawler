@@ -25,3 +25,6 @@ Once you have your box ready, it's time to configure your Java environment. So p
 
 ## Usage
 This new version of the Cloud Crawler exposes a REST Api that is under development. I hope a new version is coming in this quarter
+
+http://127.0.0.1:28080/CloudCrawler/
+http://127.0.0.1:28080/api/application.wadl
