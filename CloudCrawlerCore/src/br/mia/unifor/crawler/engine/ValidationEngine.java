@@ -2,6 +2,7 @@ package br.mia.unifor.crawler.engine;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import br.mia.unifor.crawler.executer.artifact.Benchmark;
@@ -16,7 +17,7 @@ public class ValidationEngine {
 		boolean deployment = validateVirtualMachines(benchmark.getVirtualMachines(), buffer);
 		
 		for (Scenario scenario : benchmark.getScenarios()) {
-			validateVirtualMachines(scenario.getApplication().getVirtualMachines(), buffer);
+			validateVirtualMachines(new ArrayList<VirtualMachine>(scenario.getVirtualMachines().values()), buffer);
 		}
 		
 		if(buffer.length() > 0){//has errors

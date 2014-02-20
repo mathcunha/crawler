@@ -5,16 +5,17 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import br.mia.unifor.crawler.executer.artifact.Application;
+import br.mia.unifor.crawler.executer.artifact.Scenario;
 import br.mia.unifor.crawler.executer.artifact.Scriptlet;
 
 public class ScriptParser {
 	static Logger logger = Logger.getLogger(ScriptParser.class.getName());
 	
-	public static Scriptlet parse(Application appliance, Scriptlet scriptlet, Object oThis){
+	public static Scriptlet parse(Scenario scenario, Scriptlet scriptlet, Object oThis){
 		final String BEGIN = "${";
 		final String END = "}";
 		Scriptlet parsed = new Scriptlet();
@@ -42,8 +43,8 @@ public class ScriptParser {
 				logger.info(method);
 				Object value = null;
 				
-				if(method.contains("applianceScope")){
-					value = callMethod(method.substring("applianceScope.".length()), appliance);
+				if(method.contains("scenarioScope")){
+					value = callMethod(method.substring("scenarioScope.".length()), scenario);
 				}else{
 					value = callMethod(method, oThis);
 				}
@@ -105,13 +106,10 @@ public class ScriptParser {
 			if(position != null){
 				retorno = ((Object[])method.invoke(target, null))[position];
 			}else if(key != null){
-				List maps = ((List)method.invoke(target, null));
-				for (Object object : maps) {
-					HashMap<String, String> map = (HashMap<String, String>) object;
-					if(map.containsKey(key)){
-						return map.get(key);
-					}
-				}
+				Map<String, Object> map = ((Map)method.invoke(target, null));
+				
+				return map.get(key);
+					
 			}else{
 				retorno = method.invoke(target, null);
 			}

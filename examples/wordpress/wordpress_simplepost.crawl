@@ -5,8 +5,8 @@ rounds: 3
 interval: 5000
 
 - !include
-  file: /vagrant/default.yml
-
+  file: default.crawl
+  
 virtualMachines:
  - &gatling !virtualMachine
    providerId: us-east-1d/i-f9abd6d7
@@ -14,45 +14,40 @@ virtualMachines:
    image: us-east-1/ami-7ea24a17
    name: gatling
    scripts:
-   - !scriptlet
-      name: workload
-      scripts:
-       - "execution.sh ${applianceScope.properties(wordpress).publicIpAddress}"
+    submit_workload : !scriptlet      
+     scripts:
+      - "execution.sh ${scenarioScope.virtualMachines(wordpress).publicIpAddress}"
 
  - &wordpress !virtualMachine
    providerId: us-east-1a/i-c9d747
    type: *m1_large
    name: wordpress
+   publicIpAddress: 127.0.0.1
    image: us-east-1/ami-7ea24a17
    scripts:
-     - !scriptlet
-      name: startup
-      scripts:
-       - "config_redis.sh ${applianceScope.properties(gatling).publicIpAddress}"
-     - !scriptlet
-      name: start_metric_collection
-      scripts:
-       - "service logstash start"
-     - !scriptlet
-      name: stop_metric_collection
-      scripts:
-       - "service logstash stop"
+     start_vm : 
+       !scriptlet
+          scripts:
+           - "config_redis.sh ${scenarioScope.virtualMachines(gatling).publicIpAddress}"
+     start_metric : 
+       !scriptlet
+         scripts:
+          - "service logstash start"
+     stop_metric : 
+       !scriptlet
+         scripts:
+          - "service logstash stop"
 scenarios:
   - !scenario
     id: 1
-    metric: !metric
-     targets:
-      - *wordpress
     workload: !workload
      targets:
       - *gatling
      functions:
       - !workloadFunction
        values: "10, 20, 30"
-    application: &wordpress_app !application
-      description: nova aplicacao
-      properties:
-       - gatling : *gatling
-       - wordpress : *wordpress
-      virtualMachines:
-       - *wordpress
+    metric: 
+      wordpress : *wordpress
+    virtualMachines:
+      gatling : *gatling
+      wordpress : *wordpress

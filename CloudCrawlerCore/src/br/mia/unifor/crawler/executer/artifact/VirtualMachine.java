@@ -1,17 +1,13 @@
 package br.mia.unifor.crawler.executer.artifact;
 
 
-import java.util.List;
+import java.util.Map;
 
 
 public class VirtualMachine extends CrawlerArtifact{
 	private VirtualMachineType type;
 	private String name;
-	
-	private List<Scriptlet> scripts;	
-	
-	private List<Component> components;
-	
+	private Map<String, Scriptlet> scripts;
 	private Boolean temporary = false;
 	private String image;
 	private String providerId;
@@ -67,15 +63,7 @@ public class VirtualMachine extends CrawlerArtifact{
 
 	public String getPrivateIpAddress() {
 		return privateIpAddress;
-	}	
-
-	public void setComponents(List<Component> components) {
-		this.components = components;
-	}
-
-	public List<Component> getComponents() {
-		return components;
-	}	
+	}		
 
 	public String getImage() {
 		return image;
@@ -101,20 +89,11 @@ public class VirtualMachine extends CrawlerArtifact{
 		this.providerId = providerId;
 	}
 
-	public List<Scriptlet> getScripts() {
+	public Map<String, Scriptlet> getScripts() {
 		return scripts;
 	}
 
-	public void setScripts(List<Scriptlet> scripts) {
+	public void setScripts(Map<String, Scriptlet> scripts) {
 		this.scripts = scripts;
-	}
-	
-	public Scriptlet getScriptlet(String name){
-		for (Scriptlet scriptlet : getScripts()) {
-			if(name.equals(scriptlet.getName())){
-				return scriptlet;
-			}
-		}
-		return null;
-	}
+	}	
 }

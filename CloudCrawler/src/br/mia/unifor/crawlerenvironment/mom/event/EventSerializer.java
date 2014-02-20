@@ -5,11 +5,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 
-import br.mia.unifor.crawler.executer.artifact.ApplicationImpl;
 import br.mia.unifor.crawler.executer.artifact.Benchmark;
 import br.mia.unifor.crawler.executer.artifact.Component;
 import br.mia.unifor.crawler.executer.artifact.InstanceTypeCapacityLevels;
-import br.mia.unifor.crawler.executer.artifact.Metric;
 import br.mia.unifor.crawler.executer.artifact.Provider;
 import br.mia.unifor.crawler.executer.artifact.Scenario;
 import br.mia.unifor.crawler.executer.artifact.Scriptlet;
@@ -44,15 +42,13 @@ public class EventSerializer {
 		reader.getConfig().setClassTag("virtualMachineType",
 				VirtualMachineType.class);
 		reader.getConfig().setClassTag("virtualMachine", VirtualMachine.class);
-		reader.getConfig().setClassTag("metric", Metric.class);
 		reader.getConfig().setClassTag("instanceTypeCapacityLevel",
 				InstanceTypeCapacityLevels.class);
 		reader.getConfig().setClassTag("workload", Workload.class);
 		reader.getConfig().setClassTag("scenario", Scenario.class);
 		reader.getConfig().setClassTag("provider", Provider.class);
 		reader.getConfig().setClassTag("scriptlet", Scriptlet.class);
-		reader.getConfig().setClassTag("component", Component.class);
-		reader.getConfig().setClassTag("application", ApplicationImpl.class);
+		reader.getConfig().setClassTag("component", Component.class);		
 
 		reader.getConfig().setClassTag("benchmark", Benchmark.class);
 

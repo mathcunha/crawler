@@ -2,6 +2,7 @@ package br.mia.unifor.crawlerenvironment.mom;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,8 +44,7 @@ public class BenchmarkConsumer implements Runnable {
 		Set<VirtualMachine> virtualMachines = new HashSet<VirtualMachine>();
 		virtualMachines.addAll(benchmark.getVirtualMachines());
 		for (Scenario scenario : benchmark.getScenarios()) {
-			virtualMachines.addAll(scenario.getApplication()
-					.getVirtualMachines());
+			virtualMachines.addAll(scenario.getVirtualMachines().values());
 		}
 
 		for (VirtualMachine virtualMachine : virtualMachines) {
@@ -174,7 +174,7 @@ public class BenchmarkConsumer implements Runnable {
 		}
 	}
 	
-	private void verifyAlreadyCreatedVirtualMachines(List<VirtualMachine> virtualMachines){
+	private void verifyAlreadyCreatedVirtualMachines(Collection<VirtualMachine> virtualMachines){
 		//As the user can let the crawler create yours VMs, and the providersId information is only known after the serialization of the events, we have to store this information in order to do not create this VM at each new scenario
 		VirtualMachine lVirtualMachine;
 		for (VirtualMachine virtualMachine : virtualMachines) {
@@ -185,7 +185,7 @@ public class BenchmarkConsumer implements Runnable {
 		}
 	}
 	
-	private void updateIdsCreatedVirtualMachines(List<VirtualMachine> virtualMachines){
+	private void updateIdsCreatedVirtualMachines(Collection<VirtualMachine> virtualMachines){
 		for (VirtualMachine virtualMachine : virtualMachines) {
 			this.virtualMachines.put(virtualMachine.getId(), virtualMachine);
 		}
@@ -210,23 +210,23 @@ public class BenchmarkConsumer implements Runnable {
 
 		} else if (BenchmarkEvent.ACTION_NEW_SCENARIO.equals(event.getAction())) {
 
-			verifyAlreadyCreatedVirtualMachines(((Scenario) event.getTarget()).getApplication().getVirtualMachines());
+			verifyAlreadyCreatedVirtualMachines(((Scenario) event.getTarget()).getVirtualMachines().values());
 			EngineAsync.startInstances((Scenario) event.getTarget());
-			updateIdsCreatedVirtualMachines(((Scenario) event.getTarget()).getApplication().getVirtualMachines());
+			updateIdsCreatedVirtualMachines(((Scenario) event.getTarget()).getVirtualMachines().values());
 
 		} else if (BenchmarkEvent.ACTION_NEW_WORKLOAD.equals(event.getAction())) {
 			WorkloadEvent lWorkloadEvent = (WorkloadEvent) event;
 
-			verifyAlreadyCreatedVirtualMachines(((Scenario) event.getTarget()).getApplication().getVirtualMachines());
+			verifyAlreadyCreatedVirtualMachines(((Scenario) event.getTarget()).getVirtualMachines().values());
 			EngineAsync.startInstances(lWorkloadEvent.getScenario());
-			updateIdsCreatedVirtualMachines(((Scenario) event.getTarget()).getApplication().getVirtualMachines());
+			updateIdsCreatedVirtualMachines(((Scenario) event.getTarget()).getVirtualMachines().values());
 
 			EngineAsync.execTests(lWorkloadEvent.getScenario(),
 					lWorkloadEvent.getBenchmark(),
 					(WorkloadFunction) lWorkloadEvent.getTarget());
 
 		} else if (BenchmarkEvent.ACTION_END_SCENARIO.equals(event.getAction())) {
-			verifyAlreadyCreatedVirtualMachines(((Scenario) event.getTarget()).getApplication().getVirtualMachines());
+			verifyAlreadyCreatedVirtualMachines(((Scenario) event.getTarget()).getVirtualMachines().values());
 			EngineAsync.stopLocalInstances((Scenario) event.getTarget(),
 					event.getBenchmark());
 		} else {

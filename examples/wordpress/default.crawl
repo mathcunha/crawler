@@ -15,6 +15,7 @@ virtualMachineTypes:
     provider: *ec2
 
 properties:
- - &chef_script_wordpress !scriptlet
+  chef_script_wordpress : 
+    &chef_script_wordpress !scriptlet
      scripts:
       - "knife ec2 server create --availability-zone us-east-1a --node-name ${name} --flavor ${type.providerProfile} --image ${image} --run-list \"role[wordpress-role]\" --ssh-user ${type.provider.userName} --ssh-key chef  --identity-file chef.pem  -c knife.rb"

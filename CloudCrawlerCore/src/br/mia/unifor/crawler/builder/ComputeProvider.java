@@ -25,9 +25,8 @@ import org.jclouds.sshj.config.SshjSshClientModule;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Module;
 
-import br.mia.unifor.crawler.executer.artifact.Application;
-import br.mia.unifor.crawler.executer.artifact.Component;
 import br.mia.unifor.crawler.executer.artifact.Provider;
+import br.mia.unifor.crawler.executer.artifact.Scenario;
 import br.mia.unifor.crawler.executer.artifact.Scriptlet;
 import br.mia.unifor.crawler.executer.artifact.VirtualMachine;
 import br.mia.unifor.crawler.executer.artifact.VirtualMachineType;
@@ -72,7 +71,7 @@ public abstract class ComputeProvider {
 
 		String ip = metadata.getPublicAddresses().iterator().next();
 
-		runScript(instance, instance.getScriptlet("shutdown"), ip, logger);
+		runScript(instance, instance.getScripts().get("stop_vm"), ip, logger);
 		stopInstanceAction(instance);
 	}
 
@@ -98,11 +97,11 @@ public abstract class ComputeProvider {
 		return false;
 	}
 	
-	public void createInstance(VirtualMachine instance, Application appliance){
+	public void createInstance(VirtualMachine instance, Scenario scenario){
 		List <Scriptlet> scriptlets = new ArrayList<Scriptlet>();
 		
-		if(instance.getScriptlet("create") != null){
-			scriptlets.add(ScriptParser.parse(appliance, instance.getScriptlet("create"), instance));
+		if(instance.getScripts().get("create") != null){
+			scriptlets.add(ScriptParser.parse(scenario, instance.getScripts().get("create"), instance));
 		}else{
 			try {
 				Set<? extends NodeMetadata> nodes = context.getComputeService().createNodesInGroup(instance.getName(), 1, getTemplate(instance.getType(), instance.getImage()));
@@ -124,12 +123,12 @@ public abstract class ComputeProvider {
 	
 	public abstract void getTemplate(Template template);
 
-	public void startInstance(VirtualMachine instance, Application appliance) {
+	public void startInstance(VirtualMachine instance, Scenario scenario) {
 
 		logger.info("the instance will be started " + instance.getProviderId());
 		
 		if(instance.getProviderId() == null){
-			createInstance(instance, appliance);
+			createInstance(instance, scenario);
 		}
 
 		NodeMetadata metadata = context.getComputeService().getNodeMetadata(
@@ -150,7 +149,7 @@ public abstract class ComputeProvider {
 
 			if (!validateSSHConnection(ip)) {
 				stopInstance(instance);
-				startInstance(instance, appliance);
+				startInstance(instance, scenario);
 			} else {
 
 				instance.setPublicIpAddress(metadata.getPublicAddresses()
@@ -161,28 +160,11 @@ public abstract class ComputeProvider {
 
 				List<Scriptlet> scriptlets = new ArrayList<Scriptlet>();
 
-				if (instance.getComponents() != null) {
-					for (Component app : instance.getComponents()) {
+				
 
-						if (app.getConfig() != null) {
-							for (Scriptlet scriptlet : app.getConfig()) {
-								scriptlets.add(ScriptParser.parse(appliance,
-										scriptlet, instance));
-							}
-						}
-
-						if (app.getOnStartup() != null) {
-							for (Scriptlet scriptlet : app.getOnStartup()) {
-								scriptlets.add(ScriptParser.parse(appliance,
-										scriptlet, instance));
-							}
-						}
-					}
-				}
-
-				if (instance.getScriptlet("startup") != null) {
-					Scriptlet scriptlet = instance.getScriptlet("startup"); 
-					scriptlets.add(ScriptParser.parse(appliance, scriptlet, instance));
+				if (instance.getScripts().get("start_vm") != null) {
+					Scriptlet scriptlet = instance.getScripts().get("start_vm"); 
+					scriptlets.add(ScriptParser.parse(scenario, scriptlet, instance));
 				}				
 
 				runScript(instance, scriptlets, ip, logger);
@@ -195,29 +177,14 @@ public abstract class ComputeProvider {
 
 				changeInstanceType(instance, metadata);
 
-				startInstance(instance, appliance);
+				startInstance(instance, scenario);
 			} else {
 				instance.setPublicIpAddress(metadata.getPublicAddresses()
 						.iterator().next());
 
 				instance.setPrivateIpAddress(metadata.getPrivateAddresses()
 						.iterator().next());
-
-				List<Scriptlet> scriptlets = new ArrayList<Scriptlet>();
-
-				if (instance.getComponents() != null) {
-
-					for (Component app : instance.getComponents()) {
-						if (app.getConfig() != null)
-							for (Scriptlet scriptlet : app.getConfig()) {
-								scriptlets.add(ScriptParser.parse(appliance,
-										scriptlet, instance));
-							}
-					}
-				}
-
-				runScript(instance, scriptlets, instance.getPublicIpAddress(),
-						logger);
+				
 			}
 		}
 

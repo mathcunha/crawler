@@ -1,6 +1,7 @@
 package br.mia.unifor.crawler.executer.artifact;
 
 import java.util.List;
+import java.util.Map;
 
 import br.mia.unifor.crawler.engine.ValidationException;
 
@@ -14,8 +15,7 @@ public class Benchmark extends CrawlerArtifact{
 	private String className;
 	private String resultEndPoint;
 	private List<VirtualMachineType> virtualMachineTypes;
-	private List<VirtualMachine> virtualMachines;
-	private List<Metric> metrics;
+	private List<VirtualMachine> virtualMachines;	
 	private List<InstanceTypeCapacityLevels> instanceTypeCapacityLevels;
 	private List<Workload> workloads;
 	private List<Scenario> scenarios;
@@ -77,15 +77,7 @@ public class Benchmark extends CrawlerArtifact{
 
 	public List<VirtualMachine> getVirtualMachines() {
 		return virtualMachines;
-	}
-
-	public void setMetrics(List<Metric> metrics) {
-		this.metrics = metrics;
-	}
-
-	public List<Metric> getMetrics() {
-		return metrics;
-	}
+	}	
 
 	public void setInstanceTypeCapacityLevels(
 			List<InstanceTypeCapacityLevels> instanceTypeCapacityLevels) {
