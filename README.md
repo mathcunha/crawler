@@ -20,6 +20,8 @@ After cloning the project, you will have a folder with the configuration to gene
 
 Once you have your box ready, it's time to configure your Java environment. So pick up your favorite jdk, set the JAVA_HOME and, inside the root folder of the project, execute the following commands:
 
+<p>git clone https://github.com/mathcunha/crawler.git</p>
+<p>cd crawler</p>
 <p>./exec.sh</p>
 
 
