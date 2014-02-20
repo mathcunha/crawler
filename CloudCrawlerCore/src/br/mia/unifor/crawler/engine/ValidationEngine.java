@@ -14,9 +14,10 @@ public class ValidationEngine {
 	public static void validate(Benchmark benchmark) throws ValidationException, FileNotFoundException, IOException{
 		StringBuffer buffer = new StringBuffer();
 		
-		boolean deployment = validateVirtualMachines(benchmark.getVirtualMachines(), buffer);
+		boolean deployment = validateVirtualMachines(benchmark.getVirtualMachines(), buffer);		
 		
 		for (Scenario scenario : benchmark.getScenarios()) {
+			validateScenario(scenario, buffer);
 			validateVirtualMachines(new ArrayList<VirtualMachine>(scenario.getVirtualMachines().values()), buffer);
 		}
 		
@@ -24,6 +25,31 @@ public class ValidationEngine {
 			throw new ValidationException(buffer.toString());
 		}
 		
+	}
+	
+	private static void validateScenario(Scenario scenario, StringBuffer buffer){
+		if(isStringEmpty(scenario.getName())){
+			buffer.append("The scenario must have a name \n");
+		}
+		
+		if(scenario.getWorkload() == null || scenario.getWorkload().getTargets() == null || scenario.getWorkload().getTargets().size() == 0){
+			buffer.append("At least one virtual machine must be target of the workload\n");
+		}else{
+			for (VirtualMachine vm : scenario.getWorkload().getTargets()) {
+				if(vm.getScripts().get("submit_workload") == null){
+					buffer.append("the workload vm must have a script named submit_workload\n");
+				}
+			}
+		}
+		
+		for (VirtualMachine vm : scenario.getMetric().values()){
+			if(vm.getScripts().get("start_metric") == null){
+				buffer.append("the metric vm must have a script named start_metric\n");
+			}
+			if(vm.getScripts().get("stop_metric") == null){
+				buffer.append("the metric vm must have a script named stop_metric\n");
+			}
+		}
 	}
 
 	private static boolean validateVirtualMachines(List<VirtualMachine> virtualMachines, StringBuffer buffer) {

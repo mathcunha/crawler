@@ -1,7 +1,6 @@
 package br.mia.unifor.crawler.executer.artifact;
 
 import java.util.List;
-import java.util.Map;
 
 import br.mia.unifor.crawler.engine.ValidationException;
 

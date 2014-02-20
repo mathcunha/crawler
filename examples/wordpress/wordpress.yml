@@ -16,8 +16,8 @@ virtualMachineTypes:
  - &m1_small !virtualMachineType
     providerProfile: m1.small
     provider: *ec2
- - &m1_large !virtualMachineType
-    providerProfile: m1.large
+ - &m1_medium !virtualMachineType
+    providerProfile: m1.medium
     provider: *ec2
 
 properties:
@@ -47,7 +47,7 @@ virtualMachines:
  - &wordpress !virtualMachine
    id: 2
    providerId: us-east-1a/i-c9d747
-   type: *m1_large
+   type: *m1_medium
    name: wordpress
    publicIpAddress: 127.0.0.1
    image: us-east-1/ami-7ea24a17
