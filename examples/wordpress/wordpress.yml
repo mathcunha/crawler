@@ -57,6 +57,7 @@ virtualMachines:
        !scriptlet
          scripts:
           - "service logstash start"
+          - "sed -i \"s/http.*/http:\/\/${publicIpAddress}'\);/g\" /var/www/wordpress/wp-config.php"
      stop_metric : 
        !scriptlet
          scripts:
