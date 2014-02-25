@@ -96,16 +96,12 @@ public class EngineAsync {
 		startInstances(null, benchmark.getVirtualMachines());
 	}
 
-	public static Boolean execTests(Scenario scenario, Benchmark benchmark,
+	public static void execTests(Scenario scenario, Benchmark benchmark,
 			WorkloadFunction workloadFunction) throws Exception,
 			InterruptedException {
 
-		Boolean result = Boolean.TRUE;
-
-		result &= Execution.execTests(scenario, benchmark, workloadFunction,
-				scenario.getWorkload().getTargets());
-
-		return result;
+		Execution.execTests(scenario, benchmark, workloadFunction, scenario.getWorkload().getTargets());
+		
 	}
 	
 	public static void main(String[] args) throws ValidationException, FileNotFoundException, IOException {

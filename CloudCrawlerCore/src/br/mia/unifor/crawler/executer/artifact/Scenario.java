@@ -18,10 +18,7 @@ public class Scenario extends CrawlerArtifact{
 		scenario.setMetric(getMetric());
 		
 		return scenario;
-	}
-
-	
-
+	}	
 	
 	public void setWorkload(Workload workload) {
 		this.workload = workload;

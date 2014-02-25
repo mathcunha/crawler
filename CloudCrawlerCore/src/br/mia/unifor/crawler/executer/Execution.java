@@ -1,7 +1,6 @@
 package br.mia.unifor.crawler.executer;
 
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,7 +11,6 @@ import br.mia.unifor.crawler.executer.artifact.Scenario;
 import br.mia.unifor.crawler.executer.artifact.Scriptlet;
 import br.mia.unifor.crawler.executer.artifact.VirtualMachine;
 import br.mia.unifor.crawler.executer.artifact.WorkloadFunction;
-import br.mia.unifor.crawler.executer.client.BenchmarkPartialResult;
 import br.mia.unifor.crawler.parser.ScriptParser;
 
 public class Execution {
@@ -58,10 +56,9 @@ public class Execution {
 
 	}	
 	
-	public static Boolean execTests(Scenario scenario, Benchmark benchmark,
+	public static void execTests(Scenario scenario, Benchmark benchmark,
 			WorkloadFunction workload, List<VirtualMachine> targets)
-			throws Exception, InterruptedException {
-		Boolean retorno = Boolean.FALSE;
+			throws Exception, InterruptedException {		
 
 		for (String workloadValue : workload.getValuesList()) {
 			
@@ -83,7 +80,7 @@ public class Execution {
 				runScript(scenario, target, target.getScripts().get("stop_metric"));
 			}
 			
-			BenchmarkPartialResult execution = new BenchmarkPartialResult();
+			/*BenchmarkPartialResult execution = new BenchmarkPartialResult();
 
 			execution.setBenchmark(benchmark);
 
@@ -93,24 +90,19 @@ public class Execution {
 
 			execution.setWorkload(workloadValue);
 
-			//retorno |= persistResults(execution, results, benchmark);
-			retorno = Boolean.TRUE;
-
-			if (!retorno) {
-				logger.info("no successful execution for this workload");
-			}
+			retorno |= persistResults(execution, results, benchmark);*/
+			
 
 		}
-
-		return retorno;
+		
 	}
 	
-	private static Scriptlet generateScript(String scriptName) {
+	/*private static Scriptlet generateScript(String scriptName) {
 		Scriptlet script = new Scriptlet();
 		script.setScripts(Arrays
 				.asList(new String[] { "echo '#self-generated script' > ~/"+scriptName, "chmod 755 ~/"+scriptName}));
 		
 		logger.log(Level.WARNING, "generating script ~/"+scriptName);
 		return script;
-	}
+	}*/
 }
