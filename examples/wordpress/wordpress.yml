@@ -28,7 +28,8 @@ properties:
    start_vm : 
      &start_vm !scriptlet
       scripts :
-       - "config_redis.sh ${scenarioScope.virtualMachines(gatling).publicIpAddress}"
+       - "sudo sed -i "s/http.*'/http:\/\/${publicIpAddress}'/g" /var/www/wordpress/wp-config.php"
+       - "sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(gatling).publicIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf"
    chef_script_wordpress : 
     &chef_script_wordpress !scriptlet
      scripts:
