@@ -196,7 +196,7 @@ public class BenchmarkResource extends CloudCrawlerEnvironmentResource {
 
 				(new Thread(lBenchmarkController)).start();
 				
-				return getBenchmarkJSON(benchmark.getId(), "RUNNING", lBenchmarkController.getProducer().getEvents().size()+"", ""+BenchmarkController.listMessages(BenchmarkController.getQueueExecutionName(benchmark.getId())));
+				return getBenchmarkJSON(benchmark.getId(), "RUNNING", lBenchmarkController.getProducer().getEvents().size()+"", ""+lBenchmarkController.getProducer().getEvents().size());
 			} catch (FileNotFoundException e) {
 				logger.log(Level.SEVERE, "failure loading the benchmark file",
 						e);
