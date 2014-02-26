@@ -68,7 +68,7 @@ public class SSHClient {
 			// username and password will be given via UserInfo interface.
 			UserInfo ui = new MyUserInfo(credential, password);
 			session.setUserInfo(ui);
-			session.setServerAliveInterval(2000);
+			//session.setServerAliveInterval(2000);
 
 			if (ui.getPassphrase() != null) {
 				jsch.addIdentity(ui.getPassphrase());

@@ -145,7 +145,14 @@ public abstract class ComputeProvider {
 
 			String ip = metadata.getPublicAddresses().iterator().next();
 			
-			for (int i = 0; i < 3 && !(validateSSHConnection(ip)); i++);
+			for (int i = 0; i < 3 && !(validateSSHConnection(ip)); i++){
+				try {
+					logger.info("waiting "+(5000*i)+" ms to validate the ssh connection");
+					Thread.currentThread().sleep(5000*i);
+				} catch (InterruptedException e) {
+					logger.log(Level.SEVERE, e.getMessage(), e);
+				}				
+			}
 
 			if (!validateSSHConnection(ip)) {
 				stopInstance(instance);
