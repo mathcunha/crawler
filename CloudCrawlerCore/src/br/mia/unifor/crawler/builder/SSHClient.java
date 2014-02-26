@@ -28,9 +28,9 @@ public class SSHClient {
 		StringBuffer result = new StringBuffer();
 		for (String command : commands.getScripts()) {
 			String strResult = exec(command, user, host, credential, password);
-			if (strResult != null){
+			if (strResult != null) {
 				result = result.append(strResult);
-			}else{
+			} else {
 				return null;
 			}
 		}
@@ -39,14 +39,14 @@ public class SSHClient {
 	}
 
 	private static void readAll(BufferedReader bufferedReader,
-			StringBuffer strBuff) throws IOException{
+			StringBuffer strBuff) throws IOException {
 		char[] charBuffer = new char[4096];
 		int count = 0;
 
 		do {
 			logger.info("reading the buffer");
 			count = bufferedReader.read(charBuffer, 0, charBuffer.length);
-			logger.info(count+" chars will be appended");
+			logger.info(count + " chars will be appended");
 			if (count >= 0)
 				strBuff.append(charBuffer, 0, count);
 		} while (count > 0);
@@ -61,12 +61,14 @@ public class SSHClient {
 		Session session = null;
 		ChannelExec channel = null;
 		boolean connected = true;
+		String value = "";
 		try {
 			session = jsch.getSession(user, host, 22);
 
 			// username and password will be given via UserInfo interface.
 			UserInfo ui = new MyUserInfo(credential, password);
 			session.setUserInfo(ui);
+			session.setServerAliveInterval(2000);
 
 			if (ui.getPassphrase() != null) {
 				jsch.addIdentity(ui.getPassphrase());
@@ -78,30 +80,38 @@ public class SSHClient {
 			channel.setCommand(command);
 			channel.setInputStream(null);
 			InputStream stdout = channel.getInputStream();
-			InputStream stderr = channel.getErrStream();
 			channel.connect();
 
-			while (!channel.isClosed()) {
+			/*
+			 * while (!channel.isClosed()) { Thread.sleep(1000); }
+			 * 
+			 * logger.info("channel closed"); StringBuffer result = new
+			 * StringBuffer(); if (channel.getExitStatus() != 0) {
+			 * BufferedReader bufferedReader = new BufferedReader( new
+			 * InputStreamReader(stderr)); readAll(bufferedReader, result);
+			 * 
+			 * throw new Exception(result.toString()); } else { BufferedReader
+			 * bufferedReader = new BufferedReader( new
+			 * InputStreamReader(stdout)); readAll(bufferedReader, result);
+			 * String value = result.toString(); logger.info("ssh return is " +
+			 * value); return value; }
+			 */
+
+			byte[] tmp = new byte[1024];
+			first: while (true) {
+				second: while (stdout.available() > 0) {
+					int i = stdout.read(tmp, 0, 1024);
+					value += new String(tmp, 0, i);
+					if (i < 0) {
+						break first;
+					}
+				}
+				if (channel.isClosed()) {
+					break first;
+				}
+
 				Thread.sleep(1000);
 			}
-
-			logger.info("channel closed");
-			StringBuffer result = new StringBuffer();
-			if (channel.getExitStatus() != 0) {
-				BufferedReader bufferedReader = new BufferedReader(
-						new InputStreamReader(stderr));
-				readAll(bufferedReader, result);
-
-				throw new Exception(result.toString());
-			} else {
-				BufferedReader bufferedReader = new BufferedReader(
-						new InputStreamReader(stdout));
-				readAll(bufferedReader, result);
-				String value = result.toString();
-				logger.info("ssh return is " + value);
-				return value;
-			}
-			
 
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "error executing remote script", e);
@@ -118,7 +128,7 @@ public class SSHClient {
 
 		}
 
-		return null;
+		return value;
 	}
 
 	public static class MyUserInfo implements UserInfo {

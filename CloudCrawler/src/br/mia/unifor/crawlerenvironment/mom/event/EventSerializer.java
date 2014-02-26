@@ -48,7 +48,7 @@ public class EventSerializer {
 		reader.getConfig().setClassTag("scenario", Scenario.class);
 		reader.getConfig().setClassTag("provider", Provider.class);
 		reader.getConfig().setClassTag("scriptlet", Scriptlet.class);
-		reader.getConfig().setClassTag("component", Component.class);		
+		reader.getConfig().setClassTag("component", Component.class);
 
 		reader.getConfig().setClassTag("benchmark", Benchmark.class);
 
@@ -57,29 +57,27 @@ public class EventSerializer {
 		return lBenchmarkEvent;
 	}
 
-	// public static void main(String[] args) {
-	//
-	// try {
-	// Benchmark benchmark =
-	// EngineAsync.load(Thread.currentThread().getContextClassLoader()
-	// .getResourceAsStream("specjvm2008.yml"));
-	// BenchmarkEvent event = new BenchmarkEvent(BenchmarkEvent.ACTION_NEW,
-	// benchmark, benchmark);
-	//
-	// String body = getYaml(event);
-	//
-	// System.out.println(body);
-	//
-	// InputStream is = new ByteArrayInputStream(body.getBytes());
-	//
-	// BenchmarkEvent benchmark2 = loadBenchmarkEvent(is);
-	//
-	// System.out.println(benchmark2);
-	//
-	//
-	// } catch (IOException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	// }
+	/*public static void main(String[] args) throws ValidationException, FileNotFoundException, IOException {
+
+		Benchmark benchmark = EngineAsync.load(new FileInputStream(
+				"../examples/wordpress/wordpress.yml"), Boolean.FALSE);
+		BenchmarkEvent event = new BenchmarkEvent(1, BenchmarkEvent.ACTION_NEW,
+				benchmark, benchmark);
+
+		String body = getYaml(event);
+
+		System.out.println(body);
+
+		BenchmarkEvent benchmark2 = loadBenchmarkEvent(body);
+		
+		Scenario scenario = benchmark2.getBenchmark().getScenarios().get(0);
+		scenario.getVirtualMachines().get("gatling").setPublicIpAddress("ip.gatling");
+		VirtualMachine vm = scenario.getVirtualMachines().get("wordpress");
+		vm.setPublicIpAddress("ip.wordpress");
+		Scriptlet scriptlet = vm.getScripts().get("start_vm");
+		System.out.println(ScriptParser.parse(scenario, scriptlet , vm));
+
+		System.out.println(benchmark2);
+
+	}*/
 }

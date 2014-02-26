@@ -83,7 +83,7 @@ public class ScriptParser {
 	
 	private static Object callMethodAction(String strMethod, Object target){
 		Object retorno = null;
-		
+		logger.info("method "+strMethod);
 		try {
 			
 			Integer position = null;

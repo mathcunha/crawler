@@ -158,16 +158,9 @@ public abstract class ComputeProvider {
 				instance.setPrivateIpAddress(metadata.getPrivateAddresses()
 						.iterator().next());
 
-				List<Scriptlet> scriptlets = new ArrayList<Scriptlet>();
-
-				
-
-				if (instance.getScripts().get("start_vm") != null) {
-					Scriptlet scriptlet = instance.getScripts().get("start_vm"); 
-					scriptlets.add(ScriptParser.parse(scenario, scriptlet, instance));
-				}				
-
-				runScript(instance, scriptlets, ip, logger);
+				if (instance.getScripts().get("start_vm") != null) { 
+					runScript(instance, ScriptParser.parse(scenario, instance.getScripts().get("start_vm"), instance), ip, logger);
+				}
 			}
 
 		} else {
@@ -226,14 +219,15 @@ public abstract class ComputeProvider {
 	public boolean changeInstanceType(VirtualMachine instance,
 			NodeMetadata metadata) {
 
-		logger.info("change instance resource " + instance.getProviderId());
-
 		if (!metadata.getHardware().getId()
 				.equals(instance.getType().getProviderProfile())) {
+			logger.info("change instance resource " + instance.getProviderId());
+			
 			changeInstanceType(instance);
+			
+			logger.info("instance resource changed " + instance.getProviderId());
 		}
-
-		logger.info("instance resource changed " + instance.getProviderId());
+		
 
 		return true;
 	}

@@ -24,15 +24,15 @@ public class Execution {
 		return ComputeProvider.runScript(target, scriptParsed, target.getPublicIpAddress(), logger) != null;
 	}
 
-	private static Boolean sendWorkloadValue(Scenario scenario, VirtualMachine target, String value) {
+	private static void sendWorkloadValue(Scenario scenario, VirtualMachine target, String value) {
 
 		Scriptlet scriptParsed = ScriptParser.parse(scenario, target.getScripts().get("submit_workload"), target);
-		
-		for (String strScript : scriptParsed.getScripts()) {
-			strScript.concat(" "+value);
+				
+		for (int i = 0; i < scriptParsed.getScripts().size(); i++) {
+			scriptParsed.getScripts().set(i, scriptParsed.getScripts().get(i)+" "+value);
 		}
 		
-		return ComputeProvider.runScript(target, scriptParsed, target.getPublicIpAddress(), logger) != null;
+		logger.info(ComputeProvider.runScript(target, scriptParsed, target.getPublicIpAddress(), logger));
 	}
 
 	private static Boolean isThereExecutionRunning(Scenario scenario, VirtualMachine target) {
@@ -67,7 +67,9 @@ public class Execution {
 			}
 			
 			for (VirtualMachine target : targets) {
+				logger.info("Sending workload "+workloadValue);
 				sendWorkloadValue(scenario, target, workloadValue);
+				logger.info("workload "+workloadValue+" sent");
 			}
 
 			for (VirtualMachine target : targets) {

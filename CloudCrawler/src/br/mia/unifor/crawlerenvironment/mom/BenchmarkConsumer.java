@@ -193,7 +193,7 @@ public class BenchmarkConsumer implements Runnable {
 
 	private void onMessage(BenchmarkEvent event) throws IOException, Exception,
 			InterruptedException {
-				
+		logger.info("Starting ACTION "+event.getAction());
 		if (BenchmarkEvent.ACTION_END.equals(event.getAction())) {
 			execute = false;
 			BenchmarkController controller = new BenchmarkController(benchmark,
@@ -217,9 +217,9 @@ public class BenchmarkConsumer implements Runnable {
 		} else if (BenchmarkEvent.ACTION_NEW_WORKLOAD.equals(event.getAction())) {
 			WorkloadEvent lWorkloadEvent = (WorkloadEvent) event;
 
-			verifyAlreadyCreatedVirtualMachines(((Scenario) event.getTarget()).getVirtualMachines().values());
+			verifyAlreadyCreatedVirtualMachines(lWorkloadEvent.getScenario().getVirtualMachines().values());
 			EngineAsync.startInstances(lWorkloadEvent.getScenario());
-			updateIdsCreatedVirtualMachines(((Scenario) event.getTarget()).getVirtualMachines().values());
+			updateIdsCreatedVirtualMachines(lWorkloadEvent.getScenario().getVirtualMachines().values());
 
 			EngineAsync.execTests(lWorkloadEvent.getScenario(),
 					lWorkloadEvent.getBenchmark(),
@@ -232,6 +232,8 @@ public class BenchmarkConsumer implements Runnable {
 		} else {
 			logger.log(Level.WARNING, event.getAction());
 		}
+		
+		logger.info("Ending ACTION "+event.getAction());
 	}
 
 	private void closeSession(ClientSession session) {

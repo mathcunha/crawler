@@ -9,3 +9,5 @@ echo $file
 echo "" > ~/logstash_metrics/simulation.log
 sleep 10
 cp $file ~/logstash_metrics/simulation.log
+
+exit 0

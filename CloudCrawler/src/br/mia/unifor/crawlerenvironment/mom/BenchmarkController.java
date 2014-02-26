@@ -77,7 +77,10 @@ public class BenchmarkController implements Runnable {
 					+ queueName, "messageCount");
 			session.start();
 			ClientMessage reply = requestor.request(message);
-			return (Integer) ManagementHelper.getResult(reply);
+			
+			Object response = (Object) ManagementHelper.getResult(reply);
+			logger.info("ManagementHelper messageCount ("+response+")");
+			return (Integer) response;
 
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "no client session available", e);

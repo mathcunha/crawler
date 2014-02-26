@@ -21,48 +21,27 @@ virtualMachineTypes:
     provider: *ec2
 
 properties:
-   submit_workload : 
-     &submit_workload !scriptlet
-      scripts:
-       - "execution.sh ${scenarioScope.virtualMachines(wordpress).publicIpAddress}"
-   start_vm : 
-     &start_vm !scriptlet
-      scripts :
-       - "sudo sed -i "s/http.*'/http:\/\/${publicIpAddress}'/g" /var/www/wordpress/wp-config.php"
-       - "sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(gatling).publicIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf"
    chef_script_wordpress : 
     &chef_script_wordpress !scriptlet
      scripts:
       - "knife ec2 server create --availability-zone us-east-1a --node-name ${name} --flavor ${type.providerProfile} --image ${image} --run-list \"role[wordpress-role]\" --ssh-user ${type.provider.userName} --ssh-key chef  --identity-file chef.pem  -c knife.rb"
+   test_parser : 
+    &test_parser !scriptlet
+     scripts:
+      - "echo '${scenarioScope.virtualMachines(wordpress).publicIpAddress}'>> /tmp/testip"
   
 virtualMachines:
  - &gatling !virtualMachine
    id: 1
-   providerId: us-east-1d/i-f9abd6d7
+   providerId: us-east-1/i-f9abd6d7
    type: *m1_small
    image: us-east-1/ami-7ea24a17
    name: gatling
    scripts:
-    submit_workload : *submit_workload
+    submit_workload : !scriptlet
+      scripts:
+       - "~/execution.sh ${scenarioScope.virtualMachines(wordpress).publicIpAddress}"
 
- - &wordpress !virtualMachine
-   id: 2
-   providerId: us-east-1a/i-c9d747
-   type: *m1_medium
-   name: wordpress
-   publicIpAddress: 127.0.0.1
-   image: us-east-1/ami-7ea24a17
-   scripts:
-     start_vm : *start_vm
-     start_metric : 
-       !scriptlet
-         scripts:
-          - "service logstash start"
-          - "sed -i \"s/http.*/http:\/\/${publicIpAddress}'\);/g\" /var/www/wordpress/wp-config.php"
-     stop_metric : 
-       !scriptlet
-         scripts:
-          - "service logstash stop"
 scenarios:
   - !scenario
     name: Wordpress Simple Post Scenario
@@ -74,7 +53,25 @@ scenarios:
       - !workloadFunction
        values: "10, 20, 30"
     metric: 
-      wordpress : *wordpress
+      wordpress : &wordpress !virtualMachine
+        id: 2
+        providerId: us-east-1/i-69134a48
+        type: *m1_medium
+        name: wordpress        
+        scripts:
+          start_vm : 
+            !scriptlet
+             scripts :
+              - "~/configHost.sh ${publicIpAddress}"
+              - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(gatling).publicIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+          start_metric : 
+            !scriptlet
+              scripts:
+               - "sudo service logstash-indexer start"
+          stop_metric : 
+            !scriptlet
+              scripts:
+                - "sudo service logstash-indexer stop"
     virtualMachines:
       gatling : *gatling
       wordpress : *wordpress

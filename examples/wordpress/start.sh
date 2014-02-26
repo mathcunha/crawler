@@ -1,0 +1,1 @@
+curl -F filedata=@/vagrant/crawler/crawler/examples/wordpress/wordpress.yml -i -X POST --header "Content-Type: text/plain" http://192.168.25.18:28080/api/v1/benchmark

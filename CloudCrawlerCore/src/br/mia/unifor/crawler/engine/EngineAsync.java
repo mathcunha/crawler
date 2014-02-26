@@ -1,6 +1,5 @@
 package br.mia.unifor.crawler.engine;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -13,9 +12,11 @@ import br.mia.unifor.crawler.builder.factory.ComputeProviderFactory;
 import br.mia.unifor.crawler.executer.Execution;
 import br.mia.unifor.crawler.executer.artifact.Benchmark;
 import br.mia.unifor.crawler.executer.artifact.Scenario;
+import br.mia.unifor.crawler.executer.artifact.Scriptlet;
 import br.mia.unifor.crawler.executer.artifact.VirtualMachine;
 import br.mia.unifor.crawler.executer.artifact.WorkloadFunction;
 import br.mia.unifor.crawler.parser.CrawlerParserYml;
+import br.mia.unifor.crawler.parser.ScriptParser;
 import br.mia.unifor.crawler.parser.YamlLoader;
 
 public class EngineAsync {
@@ -104,10 +105,13 @@ public class EngineAsync {
 		
 	}
 	
-	public static void main(String[] args) throws ValidationException, FileNotFoundException, IOException {
-		//Benchmark benchmark = EngineAsync.load(new FileInputStream("wordpress.yml"), Boolean.FALSE);
-		//Scenario scenario = benchmark.getScenarios().get(0);
-		//VirtualMachine vm = scenario.getVirtualMachines().get("gatling");
-		//System.out.println(ScriptParser.parse(benchmark.getScenarios().get(0), vm.getScripts().get("submit_workload") , vm));
-	}
+	/*public static void main(String[] args) throws ValidationException, FileNotFoundException, IOException {
+		Benchmark benchmark = EngineAsync.load(new FileInputStream("../examples/wordpress/wordpress.yml"), Boolean.FALSE);
+		Scenario scenario = benchmark.getScenarios().get(0);
+		scenario.getVirtualMachines().get("gatling").setPublicIpAddress("ip.gatling");
+		VirtualMachine vm = scenario.getVirtualMachines().get("wordpress");
+		vm.setPublicIpAddress("ip.wordpress");
+		Scriptlet scriptlet = vm.getScripts().get("start_vm");
+		System.out.println(ScriptParser.parse(scenario, scriptlet , vm));
+	}*/
 }
