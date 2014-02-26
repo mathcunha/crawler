@@ -34,7 +34,8 @@ import br.mia.unifor.crawler.parser.ScriptParser;
 
 public abstract class ComputeProvider {
 	protected ComputeServiceContext context = null;
-	protected static Logger logger = Logger.getLogger(ComputeProvider.class.getName());
+	protected static Logger logger = Logger.getLogger(ComputeProvider.class
+			.getName());
 	protected final Provider provider;
 
 	public ComputeProvider(Provider provider) throws IOException {
@@ -48,13 +49,16 @@ public abstract class ComputeProvider {
 		}
 
 		properties.load(input);
-		 
-		this.context = ContextBuilder.newBuilder(provider.getName())
-                .credentials(properties.getProperty("accessKey"), properties.getProperty("secretKey"))
-                .overrides(properties)
-                .modules(ImmutableSet.<Module> of(new Log4JLoggingModule(),
-                                                  new SshjSshClientModule()))
-                .buildView(ComputeServiceContext.class);
+
+		this.context = ContextBuilder
+				.newBuilder(provider.getName())
+				.credentials(properties.getProperty("accessKey"),
+						properties.getProperty("secretKey"))
+				.overrides(properties)
+				.modules(
+						ImmutableSet.<Module> of(new Log4JLoggingModule(),
+								new SshjSshClientModule()))
+				.buildView(ComputeServiceContext.class);
 	}
 
 	public ComputeServiceContext getContext() {
@@ -69,10 +73,16 @@ public abstract class ComputeProvider {
 		NodeMetadata metadata = context.getComputeService().getNodeMetadata(
 				instance.getProviderId());
 
-		String ip = metadata.getPublicAddresses().iterator().next();
+		if (metadata.getPublicAddresses().size() > 0) {
 
-		runScript(instance, instance.getScripts().get("stop_vm"), ip, logger);
-		stopInstanceAction(instance);
+			String ip = metadata.getPublicAddresses().iterator().next();
+
+			runScript(instance, instance.getScripts().get("stop_vm"), ip,
+					logger);
+			stopInstanceAction(instance);
+		}else{
+			logger.info("instance [" +instance.getProviderId()+"] already stopped ");
+		}
 	}
 
 	protected void stopInstanceAction(VirtualMachine instance) {
@@ -96,46 +106,54 @@ public abstract class ComputeProvider {
 
 		return false;
 	}
-	
-	public void createInstance(VirtualMachine instance, Scenario scenario){
-		List <Scriptlet> scriptlets = new ArrayList<Scriptlet>();
-		
-		if(instance.getScripts().get("create") != null){
-			scriptlets.add(ScriptParser.parse(scenario, instance.getScripts().get("create"), instance));
-		}else{
+
+	public void createInstance(VirtualMachine instance, Scenario scenario) {
+		List<Scriptlet> scriptlets = new ArrayList<Scriptlet>();
+
+		if (instance.getScripts().get("create") != null) {
+			scriptlets.add(ScriptParser.parse(scenario, instance.getScripts()
+					.get("create"), instance));
+		} else {
 			try {
-				Set<? extends NodeMetadata> nodes = context.getComputeService().createNodesInGroup(instance.getName(), 1, getTemplate(instance.getType(), instance.getImage()));
+				Set<? extends NodeMetadata> nodes = context.getComputeService()
+						.createNodesInGroup(
+								instance.getName(),
+								1,
+								getTemplate(instance.getType(),
+										instance.getImage()));
 				instance.setProviderId(nodes.iterator().next().getId());
 			} catch (RunNodesException e) {
-				logger.log(Level.SEVERE, "unable to create the virtualMachine with id "+instance.getId());
+				logger.log(Level.SEVERE,
+						"unable to create the virtualMachine with id "
+								+ instance.getId());
 			}
-		}		
+		}
 	}
-	
-	protected Template getTemplate(VirtualMachineType type, String image){
-		Template template = context.getComputeService().templateBuilder().hardwareId(type.getProviderProfile()).imageId(image).build();
-		
+
+	protected Template getTemplate(VirtualMachineType type, String image) {
+		Template template = context.getComputeService().templateBuilder()
+				.hardwareId(type.getProviderProfile()).imageId(image).build();
+
 		getTemplate(template);
-		
+
 		return template;
 	}
-	
-	
+
 	public abstract void getTemplate(Template template);
 
 	public void startInstance(VirtualMachine instance, Scenario scenario) {
 
 		logger.info("the instance will be started " + instance.getProviderId());
-		
-		if(instance.getProviderId() == null){
+
+		if (instance.getProviderId() == null) {
 			createInstance(instance, scenario);
 		}
 
 		NodeMetadata metadata = context.getComputeService().getNodeMetadata(
 				instance.getProviderId());
 
-		logger.info("the state of intance id " + instance.getProviderId() + " is ("
-				+ metadata.getStatus().name() + ")");
+		logger.info("the state of intance id " + instance.getProviderId()
+				+ " is (" + metadata.getStatus().name() + ")");
 		if (!NodeMetadata.Status.RUNNING.equals(metadata.getStatus())) {
 			changeInstanceType(instance, metadata);
 
@@ -144,14 +162,15 @@ public abstract class ComputeProvider {
 					instance.getProviderId());
 
 			String ip = metadata.getPublicAddresses().iterator().next();
-			
-			for (int i = 0; i < 3 && !(validateSSHConnection(ip)); i++){
+
+			for (int i = 0; i < 3 && !(validateSSHConnection(ip)); i++) {
 				try {
-					logger.info("waiting "+(5000*i)+" ms to validate the ssh connection");
-					Thread.currentThread().sleep(5000*i);
+					logger.info("waiting " + (5000 * i)
+							+ " ms to validate the ssh connection");
+					Thread.currentThread().sleep(5000 * i);
 				} catch (InterruptedException e) {
 					logger.log(Level.SEVERE, e.getMessage(), e);
-				}				
+				}
 			}
 
 			if (!validateSSHConnection(ip)) {
@@ -165,8 +184,10 @@ public abstract class ComputeProvider {
 				instance.setPrivateIpAddress(metadata.getPrivateAddresses()
 						.iterator().next());
 
-				if (instance.getScripts().get("start_vm") != null) { 
-					runScript(instance, ScriptParser.parse(scenario, instance.getScripts().get("start_vm"), instance), ip, logger);
+				if (instance.getScripts().get("start_vm") != null) {
+					runScript(instance, ScriptParser.parse(scenario, instance
+							.getScripts().get("start_vm"), instance), ip,
+							logger);
 				}
 			}
 
@@ -184,7 +205,7 @@ public abstract class ComputeProvider {
 
 				instance.setPrivateIpAddress(metadata.getPrivateAddresses()
 						.iterator().next());
-				
+
 			}
 		}
 
@@ -207,7 +228,8 @@ public abstract class ComputeProvider {
 			String ip, Logger logger) {
 		if (script != null && script.getScripts().size() > 0) {
 
-			logger.info(script.toString()+" userName "+instance.getType().getProvider().getUserName());
+			logger.info(script.toString() + " userName "
+					+ instance.getType().getProvider().getUserName());
 
 			if (instance.getType().getProvider().getPrivateKey() != null) {
 				return SSHClient.exec(script, instance.getType().getProvider()
@@ -219,7 +241,7 @@ public abstract class ComputeProvider {
 						.getPassword(), Boolean.TRUE);
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -229,12 +251,11 @@ public abstract class ComputeProvider {
 		if (!metadata.getHardware().getId()
 				.equals(instance.getType().getProviderProfile())) {
 			logger.info("change instance resource " + instance.getProviderId());
-			
+
 			changeInstanceType(instance);
-			
+
 			logger.info("instance resource changed " + instance.getProviderId());
 		}
-		
 
 		return true;
 	}
@@ -244,31 +265,39 @@ public abstract class ComputeProvider {
 	public static void main(String[] args) {
 		Properties overrides = new Properties();
 
-		   // set AMI queries to nothing
-		   overrides.setProperty(AWSEC2Constants.PROPERTY_EC2_AMI_QUERY, "");
-		   overrides.setProperty(AWSEC2Constants.PROPERTY_EC2_CC_AMI_QUERY, "");
+		// set AMI queries to nothing
+		overrides.setProperty(AWSEC2Constants.PROPERTY_EC2_AMI_QUERY, "");
+		overrides.setProperty(AWSEC2Constants.PROPERTY_EC2_CC_AMI_QUERY, "");
 
-		   ComputeServiceContext context = ContextBuilder.newBuilder("aws-ec2")
-		                      .credentials("opa", "opa")
-		                      .overrides(overrides)
-		                      .modules(ImmutableSet.<Module> of(new Log4JLoggingModule(),
-		                                                        new SshjSshClientModule()))
-		                      .buildView(ComputeServiceContext.class);
+		ComputeServiceContext context = ContextBuilder
+				.newBuilder("aws-ec2")
+				.credentials("opa", "opa")
+				.overrides(overrides)
+				.modules(
+						ImmutableSet.<Module> of(new Log4JLoggingModule(),
+								new SshjSshClientModule()))
+				.buildView(ComputeServiceContext.class);
 
-		   Template template = context.getComputeService().templateBuilder().imageId(
-		            "us-east-1/ami-ccb35ea5").hardwareId("t1.micro").build();
-		   
-		   System.out.println(template.getImage().getProviderId());
-			System.out.println(template.getImage().getDescription().indexOf("test"));
-			System.out.println(template.getImage().getDescription().indexOf("daily"));
-			System.out.println(template.getImage().getVersion());
-			System.out.println(template.getImage().getOperatingSystem().getVersion());
-			System.out.println(template.getImage().getOperatingSystem().is64Bit());
-			System.out.println(template.getImage().getOperatingSystem().getFamily());
-			System.out.println(template.getImage().getUserMetadata().get("rootDeviceType"));
-			System.out.println(template.getLocation().getId());
-			System.out.println(template.getHardware().getId());
-			System.out.println(template.getImage().getOperatingSystem().getArch());
+		Template template = context.getComputeService().templateBuilder()
+				.imageId("us-east-1/ami-ccb35ea5").hardwareId("t1.micro")
+				.build();
+
+		System.out.println(template.getImage().getProviderId());
+		System.out
+				.println(template.getImage().getDescription().indexOf("test"));
+		System.out.println(template.getImage().getDescription()
+				.indexOf("daily"));
+		System.out.println(template.getImage().getVersion());
+		System.out.println(template.getImage().getOperatingSystem()
+				.getVersion());
+		System.out.println(template.getImage().getOperatingSystem().is64Bit());
+		System.out
+				.println(template.getImage().getOperatingSystem().getFamily());
+		System.out.println(template.getImage().getUserMetadata()
+				.get("rootDeviceType"));
+		System.out.println(template.getLocation().getId());
+		System.out.println(template.getHardware().getId());
+		System.out.println(template.getImage().getOperatingSystem().getArch());
 	}
 
 }
