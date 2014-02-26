@@ -44,6 +44,9 @@ public class ScriptParser {
 				Object value = null;
 				
 				if(method.contains("scenarioScope")){
+					if(scenario == null){
+						throw new NullPointerException("the script must be executed in a scenario context, instead of Global context to use ${scenarioScope}.");
+					}
 					value = callMethod(method.substring("scenarioScope.".length()), scenario);
 				}else{
 					value = callMethod(method, oThis);
