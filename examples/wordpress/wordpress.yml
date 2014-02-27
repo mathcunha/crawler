@@ -40,11 +40,11 @@ virtualMachines:
    scripts:
     submit_workload : !scriptlet
       scripts:
-       - "~/execution.sh ${scenarioScope.virtualMachines(wordpress).publicIpAddress}"
+       - "~/execution.sh ${scenarioScope.virtualMachines(wordpress).publicIpAddress} ${scenarioScope.name}"
 
 scenarios:
   - !scenario
-    name: Wordpress Simple Post Scenario
+    name: m1_medium
     id: 1
     workload: !workload
      targets:
@@ -67,7 +67,7 @@ scenarios:
           start_metric : 
             !scriptlet
               scripts:
-               - "sudo service logstash-indexer start"
+               - "~/configMetric.sh ${scenarioScope.name}"
           stop_metric : 
             !scriptlet
               scripts:

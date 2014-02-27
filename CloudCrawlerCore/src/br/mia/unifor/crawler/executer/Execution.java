@@ -24,9 +24,9 @@ public class Execution {
 		return ComputeProvider.runScript(target, scriptParsed, target.getPublicIpAddress(), logger) != null;
 	}
 
-	private static void sendWorkloadValue(Scenario scenario, VirtualMachine target, String value) {
+	private static void runScriptWithMetric(Scriptlet scriptlet, Scenario scenario, VirtualMachine target, String value) {
 
-		Scriptlet scriptParsed = ScriptParser.parse(scenario, target.getScripts().get("submit_workload"), target);
+		Scriptlet scriptParsed = ScriptParser.parse(scenario, scriptlet, target);
 				
 		for (int i = 0; i < scriptParsed.getScripts().size(); i++) {
 			scriptParsed.getScripts().set(i, scriptParsed.getScripts().get(i)+" "+value);
@@ -63,12 +63,12 @@ public class Execution {
 		for (String workloadValue : workload.getValuesList()) {
 			
 			for (VirtualMachine target : scenario.getMetric().values()){
-				runScript(scenario, target, target.getScripts().get("start_metric"));
+				runScriptWithMetric(target.getScripts().get("start_metric"), scenario, target, workloadValue );
 			}
 			
 			for (VirtualMachine target : targets) {
 				logger.info("Sending workload "+workloadValue);
-				sendWorkloadValue(scenario, target, workloadValue);
+				runScriptWithMetric(target.getScripts().get("submit_workload"), scenario, target, workloadValue);
 				logger.info("workload "+workloadValue+" sent");
 			}
 
