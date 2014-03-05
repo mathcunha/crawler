@@ -33,7 +33,9 @@ public class FileStoreResource extends CloudCrawlerEnvironmentResource {
 	public final String baseDir;
 
 	public FileStoreResource() {
-		baseDir = Main.properties.getProperty("fs.base.dir")+ System.getProperty("file.separator");;
+		baseDir = Main.properties.getProperty("fs.base.dir")+ System.getProperty("file.separator");
+		//To Ensure the existence of the directories
+		(new File(baseDir)).mkdirs();		
 	}
 
 	@POST

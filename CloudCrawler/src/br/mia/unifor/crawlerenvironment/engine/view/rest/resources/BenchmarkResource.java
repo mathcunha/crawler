@@ -31,12 +31,15 @@ public class BenchmarkResource extends CloudCrawlerEnvironmentResource {
 
 	public BenchmarkResource() {
 		baseDir = Main.properties.getProperty("fs.base.dir")
-				+ System.getProperty("file.separator") + "bechmarks"
+				+ System.getProperty("file.separator") + "benchmarks"
 				+ System.getProperty("file.separator");
 
 		baseDirTemp = Main.properties.getProperty("fs.base.dir")
 				+ System.getProperty("file.separator") + "tmp"
 				+ System.getProperty("file.separator");
+		//To Ensure the existence of the directories
+		(new File(baseDir)).mkdirs();
+		(new File(baseDirTemp)).mkdirs();
 	}
 
 	@GET
@@ -196,7 +199,7 @@ public class BenchmarkResource extends CloudCrawlerEnvironmentResource {
 
 				(new Thread(lBenchmarkController)).start();
 				
-				return getBenchmarkJSON(benchmark.getId(), "RUNNING", lBenchmarkController.getProducer().getEvents().size()+"", ""+lBenchmarkController.getProducer().getEvents().size());
+				return getBenchmarkJSON(benchmark.getId(), "RUNNING", (new Integer(lBenchmarkController.getProducer().getEvents().size())).toString(), "0");
 			} catch (FileNotFoundException e) {
 				logger.log(Level.SEVERE, "failure loading the benchmark file",
 						e);
