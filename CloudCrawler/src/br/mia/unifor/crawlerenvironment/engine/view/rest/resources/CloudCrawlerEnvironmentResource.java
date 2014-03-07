@@ -9,7 +9,7 @@ public class CloudCrawlerEnvironmentResource {
 	protected static Logger logger = Logger
 			.getLogger(CloudCrawlerEnvironmentResource.class.getName());
 
-	public String getStackTrace(Exception e) {
+	public static String getStackTrace(Exception e) {
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
 		e.printStackTrace(pw);

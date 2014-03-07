@@ -6,6 +6,7 @@ public class Scenario extends CrawlerArtifact{
 	private Workload workload;	
 	private Map<String, VirtualMachine> metric;
 	private String name;
+	private Boolean endable = Boolean.TRUE;
 	private Map<String, VirtualMachine> virtualMachines;
 	
 	
@@ -56,5 +57,13 @@ public class Scenario extends CrawlerArtifact{
 
 	public void setMetric(Map<String, VirtualMachine> metric) {
 		this.metric = metric;
+	}
+
+	public Boolean getEndable() {
+		return endable;
+	}
+
+	public void setEndable(Boolean endable) {
+		this.endable = endable;
 	}
 }

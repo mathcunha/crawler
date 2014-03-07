@@ -39,7 +39,7 @@ public class EC2ComputeProvider extends ComputeProvider {
 
 	public boolean changeInstanceType(VirtualMachine instance) {
 		
-		String id = instance.getId().split("/")[1];
+		String id = instance.getProviderId().split("/")[1];
 		
 		ModifyInstanceAttributeRequest request = new ModifyInstanceAttributeRequest(
 				id, "instanceType");

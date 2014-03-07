@@ -35,6 +35,17 @@ public class EngineAsync {
 
 		return benchmark;
 	}
+	public static Scenario loadScenario(InputStream input, boolean validate)
+			throws IOException, ValidationException {
+		CrawlerParserYml parser = new CrawlerParserYml(input);
+		Scenario scenario = YamlLoader.loadScenario(parser.processLineByLine());
+		
+		if (validate) {
+			ValidationEngine.validateScenario(scenario);
+		}
+		
+		return scenario;
+	}
 
 	public static void stopInstances(List<VirtualMachine> instances)
 			throws IOException {
@@ -73,7 +84,7 @@ public class EngineAsync {
 
 				provider.startInstance(instance, scenario);
 
-				logger.info(instance.getId() + " pronta");
+				logger.info(instance.getId() + " ready "+instance.getProviderId());
 			}
 		}
 	}

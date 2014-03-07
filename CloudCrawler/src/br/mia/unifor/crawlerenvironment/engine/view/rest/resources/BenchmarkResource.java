@@ -26,20 +26,17 @@ import br.mia.unifor.crawlerenvironment.mom.event.BenchmarkEvent;
 @Path("/v1/benchmark")
 public class BenchmarkResource extends CloudCrawlerEnvironmentResource {
 
-	public String baseDir;
-	public String baseDirTemp;
-
-	public BenchmarkResource() {
-		baseDir = Main.properties.getProperty("fs.base.dir")
-				+ System.getProperty("file.separator") + "benchmarks"
-				+ System.getProperty("file.separator");
-
-		baseDirTemp = Main.properties.getProperty("fs.base.dir")
-				+ System.getProperty("file.separator") + "tmp"
-				+ System.getProperty("file.separator");
+	public static final String BASE_DIR = Main.properties.getProperty("fs.base.dir")
+			+ System.getProperty("file.separator") + "benchmarks"
+			+ System.getProperty("file.separator");
+	public static final String BASE_DIR_TEMP = Main.properties.getProperty("fs.base.dir")
+			+ System.getProperty("file.separator") + "tmp"
+			+ System.getProperty("file.separator");
+	
+	static{
 		//To Ensure the existence of the directories
-		(new File(baseDir)).mkdirs();
-		(new File(baseDirTemp)).mkdirs();
+		(new File(BASE_DIR)).mkdirs();
+		(new File(BASE_DIR_TEMP)).mkdirs();
 	}
 
 	@GET
@@ -62,7 +59,7 @@ public class BenchmarkResource extends CloudCrawlerEnvironmentResource {
 
 		logger.info("execution " + count);
 		
-		String name = baseDir + benchmarkId + ".yml";
+		String name = BASE_DIR + benchmarkId + ".yml";
 		File file = new File(name);
 		Benchmark benchmark = EngineAsync.load(new FileInputStream(file), false);
 		
@@ -100,7 +97,7 @@ public class BenchmarkResource extends CloudCrawlerEnvironmentResource {
 		return getBenchmarkJSON(benchmarkId, "ABORT", "-1",""+ BenchmarkController.listMessages(BenchmarkController.getQueueExecutionName(benchmarkId)));
 	}
 	
-	private void setResourcePaths(Benchmark benchmark){
+	public static void setResourcePaths(Benchmark benchmark){
 		for (Provider provider : benchmark.getProviders()) {
 			provider.setCredentialPath(Main.properties.getProperty("fs.base.dir")
 					+ System.getProperty("file.separator") +provider.getCredentialPath());
@@ -115,7 +112,7 @@ public class BenchmarkResource extends CloudCrawlerEnvironmentResource {
 	public String getResumeExecution(
 			@PathParam("benchmark_id") String benchmarkId) {
 
-		String name = baseDir + benchmarkId + ".yml";
+		String name = BASE_DIR + benchmarkId + ".yml";
 		try {
 
 			File file = new File(name);
@@ -165,7 +162,6 @@ public class BenchmarkResource extends CloudCrawlerEnvironmentResource {
 		
 		return getBenchmarkJSON("-1","-1","-1","-1");
 	}
-			
 
 	@POST
 	@Produces("application/json")
@@ -175,13 +171,13 @@ public class BenchmarkResource extends CloudCrawlerEnvironmentResource {
 		logger.log(Level.FINE, crawlFile);
 
 		File file = new FileStoreResource().insertFileResource(crawlFile,
-				baseDirTemp);
+				BASE_DIR_TEMP);
 		if (file != null) {
 			try {
 				
 				Benchmark benchmark = EngineAsync.load(new FileInputStream(file), true);
 
-				File saveFile = new File(baseDir + benchmark.getId() + ".yml");
+				File saveFile = new File(BASE_DIR + benchmark.getId() + ".yml");
 				logger.log(Level.FINE, saveFile.getCanonicalPath());
 				
 

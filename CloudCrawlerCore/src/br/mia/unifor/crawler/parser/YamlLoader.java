@@ -21,6 +21,20 @@ import com.esotericsoftware.yamlbeans.YamlWriter;
 
 
 public class YamlLoader {
+	public static Scenario loadScenario(InputStream in) throws YamlException{
+		YamlReader reader = new YamlReader(new InputStreamReader(in));
+		reader.getConfig().setClassTag("virtualMachineType",VirtualMachineType.class);
+		reader.getConfig().setClassTag("virtualMachine",VirtualMachine.class);
+		reader.getConfig().setClassTag("workload",Workload.class);
+		reader.getConfig().setClassTag("workloadFunction",WorkloadFunction.class);
+		reader.getConfig().setClassTag("scenario",Scenario.class);		
+		reader.getConfig().setClassTag("scriptlet",Scriptlet.class);		
+		
+		Scenario test = (Scenario) reader.read();
+		
+		return test;
+	}
+	
 	public static Benchmark loadTest(InputStream in) throws YamlException{
 		YamlReader reader = new YamlReader(new InputStreamReader(in));
 		reader.getConfig().setClassTag("virtualMachineType",VirtualMachineType.class);

@@ -41,6 +41,10 @@ public class BenchmarkController implements Runnable {
 	public static String getQueueExecutionName(String benchmark_id) {
 		return getQueueName("benchmark_exec", benchmark_id);
 	}
+	
+	private void addNewExecutionScenario() {
+		getProducer().postEvents(getProducer().getScenarioEvents());
+	}
 
 	private void abortExecution() {
 
@@ -146,6 +150,8 @@ public class BenchmarkController implements Runnable {
 			suspendExecution();
 		} else if (BenchmarkEvent.ACTION_ABORT.equals(action)) {
 			abortExecution();
+		} else if(BenchmarkEvent.ACTION_NEW_SCENARIO.equals(action)){
+			addNewExecutionScenario();
 		}
 		logger.info("ending " + action);
 	}

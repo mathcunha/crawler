@@ -30,6 +30,31 @@ public class BenchmarkProducer {
 		this.queueName = queueName;
 	}
 
+	public List<CloudCrawlerEnvironmentEvent> getScenarioEvents() {
+		List<CloudCrawlerEnvironmentEvent> events = new ArrayList<CloudCrawlerEnvironmentEvent>();
+		int count = 0;
+
+		for (Scenario scenario : benchmark.getScenarios()) {
+			events.add(new BenchmarkEvent(count++,
+					BenchmarkEvent.ACTION_NEW_SCENARIO, scenario, benchmark));
+			for (WorkloadFunction workloadFunction : scenario.getWorkload()
+					.getFunctions()) {
+				for (int i = 0; i < benchmark.getRounds(); i++) {
+					events.add(new WorkloadEvent(count++,
+							BenchmarkEvent.ACTION_NEW_WORKLOAD,
+							workloadFunction, benchmark, scenario));
+				}
+			}
+			if (scenario.getEndable()) {
+				events.add(new BenchmarkEvent(count++,
+						BenchmarkEvent.ACTION_END_SCENARIO, scenario, benchmark));
+			}
+		}
+
+		logger.info(events.size() + " events");
+		return events;
+	}
+
 	public List<CloudCrawlerEnvironmentEvent> getEvents() {
 		List<CloudCrawlerEnvironmentEvent> events = new ArrayList<CloudCrawlerEnvironmentEvent>();
 		int count = 0;
@@ -39,24 +64,30 @@ public class BenchmarkProducer {
 		for (Scenario scenario : benchmark.getScenarios()) {
 			events.add(new BenchmarkEvent(count++,
 					BenchmarkEvent.ACTION_NEW_SCENARIO, scenario, benchmark));
-			for (WorkloadFunction workloadFunction : scenario.getWorkload().getFunctions()) {
+			for (WorkloadFunction workloadFunction : scenario.getWorkload()
+					.getFunctions()) {
 				for (int i = 0; i < benchmark.getRounds(); i++) {
-					events.add(new WorkloadEvent(count++, BenchmarkEvent.ACTION_NEW_WORKLOAD, workloadFunction, benchmark, scenario));
-				}				
+					events.add(new WorkloadEvent(count++,
+							BenchmarkEvent.ACTION_NEW_WORKLOAD,
+							workloadFunction, benchmark, scenario));
+				}
 			}
-			events.add(new BenchmarkEvent(count++,
-					BenchmarkEvent.ACTION_END_SCENARIO, scenario, benchmark));
+			if (scenario.getEndable()) {
+				events.add(new BenchmarkEvent(count++,
+						BenchmarkEvent.ACTION_END_SCENARIO, scenario, benchmark));
+			}
 		}
 
-		events.add(new BenchmarkEvent(count++, BenchmarkEvent.ACTION_END,
-				benchmark, benchmark));
+		if (benchmark.getEndable()) {
+			events.add(new BenchmarkEvent(count++, BenchmarkEvent.ACTION_END,
+					benchmark, benchmark));
+		}
 
 		logger.info(events.size() + " events");
 		return events;
 	}
 
 	protected Boolean postEvents(List<CloudCrawlerEnvironmentEvent> events) {
-
 
 		ClientSession session = null;
 		ClientProducer producer = null;

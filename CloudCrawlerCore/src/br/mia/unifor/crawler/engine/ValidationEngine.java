@@ -51,6 +51,17 @@ public class ValidationEngine {
 			}
 		}
 	}
+	
+	public static void validateScenario(Scenario scenario) throws ValidationException{
+		StringBuffer buffer = new StringBuffer();
+		
+		validateScenario(scenario, buffer);
+		validateVirtualMachines(new ArrayList<VirtualMachine>(scenario.getVirtualMachines().values()), buffer);
+		
+		if(buffer.length() > 0){//has errors
+			throw new ValidationException(buffer.toString());
+		}
+	}
 
 	private static boolean validateVirtualMachines(List<VirtualMachine> virtualMachines, StringBuffer buffer) {
 		boolean deployment = false;

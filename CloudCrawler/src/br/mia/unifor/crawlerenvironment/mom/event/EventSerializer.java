@@ -20,7 +20,7 @@ import com.esotericsoftware.yamlbeans.YamlReader;
 import com.esotericsoftware.yamlbeans.YamlWriter;
 
 public class EventSerializer {
-	public static String getYaml(CloudCrawlerEnvironmentEvent obj) {
+	public static String getYaml(Object obj) {
 		StringWriter strWriter = new StringWriter();
 		YamlWriter writer = new YamlWriter(strWriter);
 		try {

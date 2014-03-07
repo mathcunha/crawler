@@ -1,8 +1,8 @@
 !benchmark
 id: 1
 name: SimplePost
-rounds: 3
-interval: 5000
+rounds: 1
+endable: false
 
 providers:
 #Os provedores de nuvem utilizados
@@ -46,12 +46,13 @@ scenarios:
   - !scenario
     name: m1_medium
     id: 1
+    endable: false
     workload: !workload
      targets:
       - *gatling
      functions:
       - !workloadFunction
-       values: "10, 20, 30"
+       values: "5, 10"
     metric: 
       wordpress : &wordpress !virtualMachine
         id: 2

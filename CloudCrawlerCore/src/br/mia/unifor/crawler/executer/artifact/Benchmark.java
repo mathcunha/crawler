@@ -7,12 +7,10 @@ import br.mia.unifor.crawler.engine.ValidationException;
 
 public class Benchmark extends CrawlerArtifact{
 	private String name;
-	private Integer beginHour;
-	private Integer beginMinute;
-	private Long interval;
 	private Integer rounds;
 	private String className;
 	private String resultEndPoint;
+	private Boolean endable = Boolean.TRUE;
 	private List<VirtualMachineType> virtualMachineTypes;
 	private List<VirtualMachine> virtualMachines;	
 	private List<InstanceTypeCapacityLevels> instanceTypeCapacityLevels;
@@ -21,30 +19,6 @@ public class Benchmark extends CrawlerArtifact{
 	private List<Provider> providers;
 	private List<Scriptlet> scriptlets;
 	private List<Component> components;
-
-	public Integer getBeginHour() {
-		return beginHour;
-	}
-
-	public void setBeginHour(Integer beginHour) {
-		this.beginHour = beginHour;
-	}
-
-	public Integer getBeginMinute() {
-		return beginMinute;
-	}
-
-	public void setBeginMinute(Integer beginMinute) {
-		this.beginMinute = beginMinute;
-	}
-
-	public Long getInterval() {
-		return interval;
-	}
-
-	public void setInterval(Long interval) {
-		this.interval = interval;
-	}
 
 	public Integer getRounds() {
 		return rounds;
@@ -145,6 +119,14 @@ public class Benchmark extends CrawlerArtifact{
 
 	public void setResultEndPoint(String resultEndPoint) {
 		this.resultEndPoint = resultEndPoint;
+	}
+
+	public Boolean getEndable() {
+		return endable;
+	}
+
+	public void setEndable(Boolean endable) {
+		this.endable = endable;
 	}
 
 }
