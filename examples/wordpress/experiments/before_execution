@@ -8,5 +8,6 @@ sed -i "s;\(host => \"[^\"]*\);host => \"50.19.146.164;g" /home/ubuntu/logstash_
 ./configMetric.sh c3.large 1000
 
 ./configNginx.sh 1 54.196.178.178
+sudo service nginx restart
 sed -i "s;\(host => \"[^\"]*\);host => \"50.19.146.164;g" /home/ubuntu/logstash_metrics/indexer.conf
 ./configMetric.sh c3.large 1000
