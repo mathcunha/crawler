@@ -1,0 +1,12 @@
+./clear_db.sh
+sed -i "s;\(host => \"[^\"]*\);host => \"50.19.146.164;g" /home/ubuntu/logstash_metrics/indexer.conf
+./configMetric.sh c3.large 1000
+
+./configHost.sh 54.198.116.121
+./change_database.sh 54.80.142.146
+sed -i "s;\(host => \"[^\"]*\);host => \"50.19.146.164;g" /home/ubuntu/logstash_metrics/indexer.conf
+./configMetric.sh c3.large 1000
+
+./configNginx.sh 1 54.196.178.178
+sed -i "s;\(host => \"[^\"]*\);host => \"50.19.146.164;g" /home/ubuntu/logstash_metrics/indexer.conf
+./configMetric.sh c3.large 1000
