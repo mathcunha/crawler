@@ -72,6 +72,7 @@ public class EngineAsync {
 
 	public static void startInstances(Scenario scenario) throws IOException {
 		startInstances(scenario, scenario.getVirtualMachines().values());
+		startInstances(scenario, scenario.getMetric().values());
 	}
 
 	private static void startInstances(Scenario scenario,

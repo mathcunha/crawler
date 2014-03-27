@@ -19,8 +19,6 @@ import org.jclouds.compute.RunNodesException;
 import org.jclouds.compute.domain.Image;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.Template;
-import org.jclouds.logging.log4j.config.Log4JLoggingModule;
-import org.jclouds.sshj.config.SshjSshClientModule;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Module;
@@ -55,9 +53,7 @@ public abstract class ComputeProvider {
 				.credentials(properties.getProperty("accessKey"),
 						properties.getProperty("secretKey"))
 				.overrides(properties)
-				.modules(
-						ImmutableSet.<Module> of(new Log4JLoggingModule(),
-								new SshjSshClientModule()))
+				//.modules(ImmutableSet.<Module> of(new Log4JLoggingModule(),new SshjSshClientModule()))
 				.buildView(ComputeServiceContext.class);
 	}
 
@@ -192,8 +188,12 @@ public abstract class ComputeProvider {
 			}
 
 		} else {
-			if (!metadata.getHardware().getId()
-					.equals(instance.getType().getProviderProfile())) {
+			//Jclouds bug - https://issues.apache.org/jira/browse/JCLOUDS-503
+			String hardware = "c3.large"; 
+			if(metadata.getHardware() != null){
+				hardware = metadata.getHardware().getId();
+			}
+			if (!hardware.equals(instance.getType().getProviderProfile())) {
 				stopInstance(instance);
 
 				changeInstanceType(instance, metadata);
@@ -247,9 +247,13 @@ public abstract class ComputeProvider {
 
 	public boolean changeInstanceType(VirtualMachine instance,
 			NodeMetadata metadata) {
+		//Jclouds bug - https://issues.apache.org/jira/browse/JCLOUDS-503
+		String hardware = "c3.large"; 
+		if(metadata.getHardware() != null){
+			hardware = metadata.getHardware().getId();
+		}
 
-		if (!metadata.getHardware().getId()
-				.equals(instance.getType().getProviderProfile())) {
+		if (!hardware.equals(instance.getType().getProviderProfile())) {
 			logger.info("change instance resource " + instance.getProviderId());
 
 			changeInstanceType(instance);
@@ -273,9 +277,7 @@ public abstract class ComputeProvider {
 				.newBuilder("aws-ec2")
 				.credentials("opa", "opa")
 				.overrides(overrides)
-				.modules(
-						ImmutableSet.<Module> of(new Log4JLoggingModule(),
-								new SshjSshClientModule()))
+				//.modules(ImmutableSet.<Module> of(new Log4JLoggingModule(), new SshjSshClientModule()))
 				.buildView(ComputeServiceContext.class);
 
 		Template template = context.getComputeService().templateBuilder()
