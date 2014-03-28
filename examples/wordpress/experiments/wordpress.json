@@ -478,7 +478,7 @@
       "collapsable": true,
       "panels": [
         {
-          "span": 8,
+          "span": 6,
           "editable": true,
           "group": [
             "default"
@@ -534,7 +534,7 @@
         },
         {
           "error": false,
-          "span": 4,
+          "span": 3,
           "editable": true,
           "type": "pie",
           "loadingEditor": false,
@@ -558,6 +558,36 @@
           "default_field": "DEFAULT",
           "spyable": true,
           "title": "Status"
+        },
+        {
+          "error": false,
+          "span": 3,
+          "editable": true,
+          "type": "terms",
+          "loadingEditor": false,
+          "queries": {
+            "mode": "selected",
+            "ids": [
+              3
+            ]
+          },
+          "field": "workload",
+          "exclude": [],
+          "missing": false,
+          "other": false,
+          "size": 10,
+          "order": "count",
+          "style": {
+            "font-size": "10pt"
+          },
+          "donut": false,
+          "tilt": false,
+          "labels": true,
+          "arrangement": "horizontal",
+          "chart": "bar",
+          "counter_pos": "above",
+          "spyable": true,
+          "title": "workload"
         }
       ],
       "notice": false
