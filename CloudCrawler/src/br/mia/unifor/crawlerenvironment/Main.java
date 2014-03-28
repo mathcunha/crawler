@@ -50,15 +50,11 @@ public class Main {
 		thread.setDaemon(true); // optional
 		thread.start();
 		
-		System.out
-				.println(String
-						.format("Jersey app started with WADL available at "
-								+ "%sapplication.wadl\nTry out %shelloworld\nHit enter to stop it...",
-								engine.BASE_URI, engine.BASE_URI));
-		System.in.read();
-		engine.stopServer();
-		tailer.stop();
-		EmbeddedHornetQWrapper.getEmbeddedHornetQ().stop();
+		//System.out.println(String.format("Jersey app started with WADL available at "	+ "%sapplication.wadl\nTry out %shelloworld\nHit enter to stop it...",engine.BASE_URI, engine.BASE_URI));
+		//System.in.read();
+		//engine.stopServer();
+		//tailer.stop();
+		//EmbeddedHornetQWrapper.getEmbeddedHornetQ().stop();
 
 	}
 }

@@ -47,6 +47,7 @@ virtualMachines:
     submit_workload : !scriptlet
       scripts:
        - "~/execution.sh ${scenarioScope.metric(nginx).publicIpAddress} ${scenarioScope.name}"
+       - "ruby /home/ubuntu/crawler/examples/wordpress/experiments/message.rb END"
  - &mysql !virtualMachine
    id: 2
    providerId: us-east-1/i-0dfb042c

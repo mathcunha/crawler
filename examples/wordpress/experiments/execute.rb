@@ -5,11 +5,12 @@ require 'net/http'
 class Execute
 
   attr_reader :redis
-  def initialize(ip_redis:'127.0.0.1', port_redis:6379)
+  def initialize(ip_redis:'127.0.0.1', port_redis:6379, benchmark_id:3)
      @redis = Redis.new(:host => ip_redis, :port => port_redis)
      @workloads = [25,50,75,100,125,150,200,300,400,500,600,700,800,900,1000, 1250, 1500, 1750, 2000]
      #@profile_ids = ['1_c3_large', '2_c3_large', '1_c3_xlarge', '3_c3_large', '4_c3_large', '2_c3_xlarge', '1_c3_2xlarge', '3_c3_xlarge', '4_c3_xlarge', '2_c3_2xlarge', '3_c3_2xlarge', '4_c3_2xlarge']
      @profile_ids = ['1_c3_large',  '1_c3_xlarge', '1_c3_2xlarge']
+     @benchmark_id = benchmark_id
   end
 
   def run
@@ -30,7 +31,8 @@ class Execute
 
         while(i >= 0 && i < @workloads.size)
           workload = @workloads[i]
-          scenario = get_scenario(profile_id:profile_id, workload:workload)          
+          scenario = get_scenario(profile_id:profile_id, workload:workload)
+          submit_scenario(scenario)
 
           #three executions
           for j in 0..2
@@ -110,10 +112,16 @@ class Execute
   end
 
   def submit_scenario(scenario)
-    request = Net::HTTP::Post.new('api/v1/benchmark/2', initheader = {'Content-Type' =>'text/plain'})
-    request.body = scenario
-    response = Net::HTTP.new('127.0.0.1', 28080).start {|http| http.request(request) }
-    puts"#{response}"
+    puts"new scenario - #{scenario}"
+    #request = Net::HTTP::Post.new("api/v1/benchmark/#{@benchmark_id}", initheader = {'Content-Type' =>'text/plain'})
+    #response = Net::HTTP.new('127.0.0.1', 28080).start {|http| http.request(request) }
+    uri = URI("http://127.0.0.1:28080/api/v1/scenario/#{@benchmark_id}")
+    req = Net::HTTP::Post.new(uri, initheader = {'Content-Type' =>'text/plain'})
+    req.body = scenario
+    res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+      http.request(req)
+    end
+    puts"resposta - #{res.value}"
   end
 
   def get_scenario_2(profile_id:, workload:200)
@@ -124,48 +132,48 @@ class Execute
 
   def get_scenario_4(profile_id:, workload:200)
   end
-
+  
   def get_scenario_1(profile_id:, workload:200)
-    scenario += "!scenario"
-	scenario += "    name: 1_c3_large"
-	scenario += "    id: 1"
-	scenario += "    endable: false"
-	scenario += "    workload: !workload"
-	scenario += "     targets:"
-	scenario += "      - *gatling"
-	scenario += "     functions:"
-	scenario += "      - !workloadFunction"
-	scenario += "       values: \"100\""
-	scenario += "    metric:"
-	scenario += "      nginx : *nginx"
-	scenario += "      mysql : *mysql"
-	scenario += "      wordpress : &wordpress !virtualMachine"
-	scenario += "        id: 4"
-	scenario += "        providerId: us-east-1/i-5f32c77e"
-	scenario += "        type: *c3_large"
-	scenario += "        name: wordpress        "
-	scenario += "        scripts:"
-	scenario += "          start_vm : "
-	scenario += "            !scriptlet"
-	scenario += "             scripts :"
-	scenario += "              - \"~/change_database.sh ${scenarioScope.metric(mysql).publicIpAddress}\""
-	scenario += "              - \"~/configHost.sh ${scenarioScope.metric(nginx).publicIpAddress}\""
-	scenario += "              - 'sed -i \"s;\(host => \\"[^\\"]*\);host => \\"${scenarioScope.virtualMachines(gatling).publicIpAddress};g\" /home/ubuntu/logstash_metrics/indexer.conf'"
-	scenario += "          start_metric : "
-	scenario += "            !scriptlet"
-	scenario += "              scripts:"
-	scenario += "               - \"~/configMetric.sh ${scenarioScope.name}\""
-	scenario += "          stop_metric : "
-	scenario += "            !scriptlet"
-	scenario += "              scripts:"
-	scenario += "                - \"sudo service logstash-indexer stop\""
-	scenario += "    virtualMachines:"
-	scenario += "      gatling : *gatling"
-	scenario += "      mysql : *mysql"
-	scenario += "      nginx : *nginx"
+    scenario = "!scenario\n"
+	scenario += "    name: 1_#{profile_id}\n"
+	scenario += "    id: 1\n"
+	scenario += "    endable: false\n"
+	scenario += "    workload: !workload\n"
+	scenario += "     targets:\n"
+	scenario += "      - *gatling\n"
+	scenario += "     functions:\n"
+	scenario += "      - !workloadFunction\n"
+	scenario += "       values: \"#{workload}\"\n"
+	scenario += "    metric:\n"
+	scenario += "      nginx : *nginx\n"
+	scenario += "      mysql : *mysql\n"
+	scenario += "      wordpress : &wordpress !virtualMachine\n"
+	scenario += "        id: 4\n"
+	scenario += "        providerId: us-east-1/i-5f32c77e\n"
+	scenario += "        type: *#{profile_id}\n"
+	scenario += "        name: wordpress   \n"     
+	scenario += "        scripts:\n"
+	scenario += "          start_vm : \n"
+	scenario += "            !scriptlet\n"
+	scenario += "             scripts :\n"
+	scenario += "              - \"~/change_database.sh ${scenarioScope.metric(mysql).publicIpAddress}\"\n"
+	scenario += "              - \"~/configHost.sh ${scenarioScope.metric(nginx).publicIpAddress}\"\n"
+	scenario += '              - \'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(gatling).publicIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf\'' + "\n"
+	scenario += "          start_metric : \n"
+	scenario += "            !scriptlet\n"
+	scenario += "              scripts:\n"
+	scenario += "               - \"~/configMetric.sh ${scenarioScope.name}\"\n"
+	scenario += "          stop_metric : \n"
+	scenario += "            !scriptlet\n"
+	scenario += "              scripts:\n"
+	scenario += "                - \"sudo service logstash-indexer stop\"\n"
+	scenario += "    virtualMachines:\n"
+	scenario += "      gatling : *gatling\n"
+	scenario += "      mysql : *mysql\n"
+	scenario += "      nginx : *nginx\n"
     scenario
   end
-
+  
 #DELETE FROM `wp_posts`
 #WHERE `post_type` = 'post'
 #AND DATEDIFF(NOW(), `post_date`) > 600

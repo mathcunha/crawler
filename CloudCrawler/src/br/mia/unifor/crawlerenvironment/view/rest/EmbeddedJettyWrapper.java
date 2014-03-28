@@ -90,7 +90,7 @@ public class EmbeddedJettyWrapper {
 	private Handler getWebApp(){
 		WebAppContext webapp = new WebAppContext();
         webapp.setContextPath("/CloudCrawler");
-        webapp.setWar("../CloudCrawlerView/target/CloudCrawlerView-0.0.1.war");        
+        webapp.setWar("../CloudCrawlerView/target/CloudCrawlerView-0.3.0.war");
         
         return webapp;
 	}

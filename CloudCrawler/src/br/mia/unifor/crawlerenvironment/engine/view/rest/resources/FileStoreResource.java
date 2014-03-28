@@ -120,7 +120,7 @@ public class FileStoreResource extends CloudCrawlerEnvironmentResource {
 		return list;
 	}
 
-	@GET
+	//@GET
 	@Produces("application/json")
 	public String listFileResources() {
 
@@ -129,7 +129,7 @@ public class FileStoreResource extends CloudCrawlerEnvironmentResource {
 		return JSONHelper.getJSON(getFiles(directory));		
 	}
 
-	@GET
+	//@GET
 	@Path("{fileName}")
 	@Produces("text/plain")
 	public String getFileResource(@PathParam("fileName") String fileName) {
