@@ -3,19 +3,15 @@ package br.mia.unifor.crawler.builder;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jclouds.cloudstack.functions.ReuseOrAssociateNewPublicIPAddress;
-import org.jclouds.compute.domain.ExecChannel;
-
+import br.mia.unifor.crawler.engine.CrawlException;
 import br.mia.unifor.crawler.executer.artifact.Scriptlet;
 
-import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UserInfo;
 
@@ -24,7 +20,7 @@ public class SSHClient {
 	private static Logger logger = Logger.getLogger(SSHClient.class.getName());
 
 	public static String exec(Scriptlet commands, String user, String host,
-			String credential, Boolean password) {
+			String credential, Boolean password) throws CrawlException {
 		StringBuffer result = new StringBuffer();
 		for (String command : commands.getScripts()) {
 			String strResult = exec(command, user, host, credential, password);
@@ -54,7 +50,7 @@ public class SSHClient {
 	}
 
 	public static String exec(String command, String user, String host,
-			String credential, Boolean password) {
+			String credential, Boolean password) throws CrawlException {
 
 		JSch jsch = new JSch();
 
@@ -113,8 +109,15 @@ public class SSHClient {
 				Thread.sleep(1000);
 			}
 
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, "error executing remote script", e);
+		} catch (JSchException e) {
+			logger.log(Level.SEVERE, "error executing remote script "+host, e);
+			throw new CrawlException(e.getMessage(), e); 
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "error executing remote script "+host, e);
+			throw new CrawlException(e.getMessage(), e);
+		} catch (InterruptedException e) {
+			logger.log(Level.SEVERE, "error executing remote script "+host, e);
+			throw new CrawlException(e.getMessage(), e);
 		} finally {
 
 			logger.info("disconnecting session");
@@ -175,7 +178,7 @@ public class SSHClient {
 
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		System.out.println(SSHClient.exec("~/executeSpec.sh 1 1364334910455",
 				args[0], args[1], args[2], false));
 	}

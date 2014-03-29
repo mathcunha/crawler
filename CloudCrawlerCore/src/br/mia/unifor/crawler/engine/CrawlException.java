@@ -10,5 +10,9 @@ public class CrawlException extends Exception {
 	public CrawlException(String message){
 		super(message);
 	}
+	
+	public CrawlException(String message, Throwable throwable){
+		super(message, throwable);
+	}
 
 }

@@ -1,11 +1,9 @@
 package br.mia.unifor.crawlerenvironment.mom;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -16,6 +14,7 @@ import org.hornetq.api.core.client.ClientConsumer;
 import org.hornetq.api.core.client.ClientMessage;
 import org.hornetq.api.core.client.ClientSession;
 
+import br.mia.unifor.crawler.engine.CrawlException;
 import br.mia.unifor.crawler.engine.EngineAsync;
 import br.mia.unifor.crawler.executer.artifact.Benchmark;
 import br.mia.unifor.crawler.executer.artifact.Scenario;
@@ -39,7 +38,7 @@ public class BenchmarkConsumer implements Runnable {
 				this).start();
 	}
 
-	private void stopInstances() throws IOException {
+	private void stopInstances() throws CrawlException {
 
 		Set<VirtualMachine> virtualMachines = new HashSet<VirtualMachine>();
 		virtualMachines.addAll(benchmark.getVirtualMachines());
@@ -191,8 +190,8 @@ public class BenchmarkConsumer implements Runnable {
 		}
 	}
 
-	private void onMessage(BenchmarkEvent event) throws IOException, Exception,
-			InterruptedException {
+	private void onMessage(BenchmarkEvent event) throws 
+			InterruptedException, CrawlException {
 		logger.info("Starting ACTION "+event.getAction());
 		if (BenchmarkEvent.ACTION_END.equals(event.getAction())) {
 			execute = false;

@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import br.mia.unifor.crawler.builder.ComputeProvider;
+import br.mia.unifor.crawler.engine.CrawlException;
 import br.mia.unifor.crawler.executer.artifact.Benchmark;
 import br.mia.unifor.crawler.executer.artifact.Scenario;
 import br.mia.unifor.crawler.executer.artifact.Scriptlet;
@@ -17,14 +18,14 @@ public class Execution {
 	protected static Logger logger = Logger
 			.getLogger(Execution.class.getName());	
 
-	private static Boolean runScript(Scenario scenario, VirtualMachine target, Scriptlet script) {
+	private static Boolean runScript(Scenario scenario, VirtualMachine target, Scriptlet script) throws CrawlException {
 		
 		Scriptlet scriptParsed = ScriptParser.parse(scenario, script, target);
 		
 		return ComputeProvider.runScript(target, scriptParsed, target.getPublicIpAddress(), logger) != null;
 	}
 
-	private static void runScriptWithMetric(Scriptlet scriptlet, Scenario scenario, VirtualMachine target, String value) {
+	private static void runScriptWithMetric(Scriptlet scriptlet, Scenario scenario, VirtualMachine target, String value) throws CrawlException {
 
 		Scriptlet scriptParsed = ScriptParser.parse(scenario, scriptlet, target);
 				
@@ -35,7 +36,7 @@ public class Execution {
 		logger.info(ComputeProvider.runScript(target, scriptParsed, target.getPublicIpAddress(), logger));
 	}
 
-	private static Boolean isThereExecutionRunning(Scenario scenario, VirtualMachine target) {
+	private static Boolean isThereExecutionRunning(Scenario scenario, VirtualMachine target) throws CrawlException {
 		Scriptlet script = target.getScripts().get("running");
 		String output = null;
 		
@@ -58,7 +59,7 @@ public class Execution {
 	
 	public static void execTests(Scenario scenario, Benchmark benchmark,
 			WorkloadFunction workload, List<VirtualMachine> targets)
-			throws Exception, InterruptedException {		
+			throws CrawlException, InterruptedException {		
 
 		for (String workloadValue : workload.getValuesList()) {
 			

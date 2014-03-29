@@ -14,6 +14,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import br.mia.unifor.crawler.builder.factory.ComputeProviderFactory;
+import br.mia.unifor.crawler.engine.CrawlException;
 import br.mia.unifor.crawler.engine.EngineAsync;
 import br.mia.unifor.crawler.engine.ValidationException;
 import br.mia.unifor.crawler.executer.artifact.Benchmark;
@@ -146,7 +147,7 @@ public class BenchmarkResource extends CloudCrawlerEnvironmentResource {
 		for (Provider provider : benchmark.getProviders()) {
 			try {
 				ComputeProviderFactory.getProvider(provider);
-			} catch (IOException e) {
+			} catch (CrawlException e) {
 				logger.log(Level.SEVERE, "error loading the providers context",e);
 			}
 		}

@@ -12,11 +12,9 @@ import br.mia.unifor.crawler.builder.factory.ComputeProviderFactory;
 import br.mia.unifor.crawler.executer.Execution;
 import br.mia.unifor.crawler.executer.artifact.Benchmark;
 import br.mia.unifor.crawler.executer.artifact.Scenario;
-import br.mia.unifor.crawler.executer.artifact.Scriptlet;
 import br.mia.unifor.crawler.executer.artifact.VirtualMachine;
 import br.mia.unifor.crawler.executer.artifact.WorkloadFunction;
 import br.mia.unifor.crawler.parser.CrawlerParserYml;
-import br.mia.unifor.crawler.parser.ScriptParser;
 import br.mia.unifor.crawler.parser.YamlLoader;
 
 public class EngineAsync {
@@ -48,7 +46,7 @@ public class EngineAsync {
 	}
 
 	public static void stopInstances(List<VirtualMachine> instances)
-			throws IOException {
+			throws CrawlException {
 		for (VirtualMachine instance : instances) {
 			if (!"local".equals(instance.getType().getProvider().getName())
 					&& instance.getProviderId() != null) {
@@ -70,13 +68,13 @@ public class EngineAsync {
 		}
 	}
 
-	public static void startInstances(Scenario scenario) throws IOException {
+	public static void startInstances(Scenario scenario) throws CrawlException {
 		startInstances(scenario, scenario.getVirtualMachines().values());
 		startInstances(scenario, scenario.getMetric().values());
 	}
 
 	private static void startInstances(Scenario scenario,
-			Collection<VirtualMachine> instances) throws IOException {
+			Collection<VirtualMachine> instances) throws CrawlException {
 
 		for (VirtualMachine instance : instances) {
 			if (!"local".equals(instance.getType().getProvider().getName())) {
@@ -91,7 +89,7 @@ public class EngineAsync {
 	}
 
 	public static void stopLocalInstances(Scenario scenario, Benchmark benchmark)
-			throws IOException {
+			throws CrawlException {
 		List<VirtualMachine> instances = new ArrayList<VirtualMachine>(scenario.getVirtualMachines().values());
 
 		// removendo as instancias globais
@@ -105,12 +103,12 @@ public class EngineAsync {
 		stopInstances(instances);
 	}
 
-	public static void startInstances(Benchmark benchmark) throws IOException {
+	public static void startInstances(Benchmark benchmark) throws CrawlException {
 		startInstances(null, benchmark.getVirtualMachines());
 	}
 
 	public static void execTests(Scenario scenario, Benchmark benchmark,
-			WorkloadFunction workloadFunction) throws Exception,
+			WorkloadFunction workloadFunction) throws CrawlException,
 			InterruptedException {
 
 		Execution.execTests(scenario, benchmark, workloadFunction, scenario.getWorkload().getTargets());

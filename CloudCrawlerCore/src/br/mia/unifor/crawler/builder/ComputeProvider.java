@@ -23,6 +23,7 @@ import org.jclouds.compute.domain.Template;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Module;
 
+import br.mia.unifor.crawler.engine.CrawlException;
 import br.mia.unifor.crawler.executer.artifact.Provider;
 import br.mia.unifor.crawler.executer.artifact.Scenario;
 import br.mia.unifor.crawler.executer.artifact.Scriptlet;
@@ -65,7 +66,7 @@ public abstract class ComputeProvider {
 		return (Set<? extends Image>) context.getComputeService().listImages();
 	}
 
-	public void stopInstance(VirtualMachine instance) {
+	public void stopInstance(VirtualMachine instance) throws CrawlException {
 		NodeMetadata metadata = context.getComputeService().getNodeMetadata(
 				instance.getProviderId());
 
@@ -137,7 +138,7 @@ public abstract class ComputeProvider {
 
 	public abstract void getTemplate(Template template);
 
-	public void startInstance(VirtualMachine instance, Scenario scenario) {
+	public void startInstance(VirtualMachine instance, Scenario scenario) throws CrawlException {
 
 		logger.info("the instance will be started " + instance.getProviderId());
 
@@ -217,7 +218,7 @@ public abstract class ComputeProvider {
 	}
 
 	public static void runScript(VirtualMachine instance,
-			List<Scriptlet> script, String ip, Logger logger) {
+			List<Scriptlet> script, String ip, Logger logger) throws CrawlException {
 		if (script != null)
 			for (Scriptlet scriptlet : script) {
 				runScript(instance, scriptlet, ip, logger);
@@ -225,7 +226,7 @@ public abstract class ComputeProvider {
 	}
 
 	public static String runScript(VirtualMachine instance, Scriptlet script,
-			String ip, Logger logger) {
+			String ip, Logger logger) throws CrawlException{
 		if (script != null && script.getScripts().size() > 0) {
 
 			logger.info(script.toString() + " userName "
