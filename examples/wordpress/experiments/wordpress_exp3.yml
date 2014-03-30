@@ -89,7 +89,7 @@ scenarios:
   - !scenario
     name: 1_c3_large
     id: 1
-    endable: true
+    endable: false
     workload: !workload
      targets:
       - *gatling
@@ -126,7 +126,7 @@ scenarios:
   - !scenario
     name: 1_c3_xlarge
     id: 2
-    endable: true
+    endable: false
     workload: !workload
      targets:
       - *gatling
