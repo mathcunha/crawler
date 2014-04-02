@@ -1,6 +1,7 @@
 require 'json'
 require 'redis'
 require 'net/http'
+require 'logger'
 
 class Execute
 
@@ -11,9 +12,11 @@ class Execute
      #@profile_ids = ['1_c3_large', '2_c3_large', '1_c3_xlarge', '3_c3_large', '4_c3_large', '2_c3_xlarge', '1_c3_2xlarge', '3_c3_xlarge', '4_c3_xlarge', '2_c3_2xlarge', '3_c3_2xlarge', '4_c3_2xlarge']
      @profile_ids = ['1_c3_large',  '1_c3_xlarge', '1_c3_2xlarge']
      @benchmark_id = benchmark_id
+     @logger = Logger.new('logfile.log')
   end
 
   def run
+      Process.daemon(true)
       i = 0
       up_workload = true
 
@@ -39,7 +42,7 @@ class Execute
             at_least_one_ko = false
             value = {"message"=>"init"}
 
-            puts"#{profile_id} - #{workload} - #{count_ko}"
+            @logger.info "#{profile_id} - #{workload} - #{count_ko}"
 
             until verify_end(value)
               value = onmessage(@redis.blpop("crawler")[1])
@@ -62,7 +65,7 @@ class Execute
           end
 
           #policy
-          puts"#{up_workload} - #{count_ko} - #{i}"
+          @logger.info "#{up_workload} - #{count_ko} - #{i}"
           if up_workload
             if count_ko == 3
               #start new profile
@@ -102,7 +105,7 @@ class Execute
   def start_benchmark
     #submit benchmark.yml
     command = "curl -F filedata=@/home/ubuntu/wordpress.yml -i -X POST --header \"Content-Type: text/plain\" http://127.0.0.1:28080/api/v1/benchmark"
-    puts command
+    @logger.info  command
     %x[ #{command} ]
   end
 
@@ -112,7 +115,7 @@ class Execute
   end
 
   def submit_scenario(scenario)
-    puts"new scenario - #{scenario}"
+    @logger.info "new scenario - #{scenario}"
     #request = Net::HTTP::Post.new("api/v1/benchmark/#{@benchmark_id}", initheader = {'Content-Type' =>'text/plain'})
     #response = Net::HTTP.new('127.0.0.1', 28080).start {|http| http.request(request) }
     uri = URI("http://127.0.0.1:28080/api/v1/scenario/#{@benchmark_id}")
@@ -121,7 +124,7 @@ class Execute
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|
       http.request(req)
     end
-    puts"resposta - #{res.value}"
+    @logger.info "resposta - #{res.value}"
   end
 
   def get_scenario_2(profile_id:, workload:200)
