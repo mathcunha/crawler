@@ -1,7 +1,7 @@
 !benchmark
-id: 1
+id: 6
 name: SimplePost
-rounds: 6
+rounds: 1
 endable: false
 
 providers:
@@ -46,7 +46,7 @@ virtualMachines:
  - &gatling !virtualMachine
    id: 1
    providerId: us-east-1/i-f9abd6d7
-   type: *m3_large
+   type: *c3_xlarge
    image: us-east-1/ami-7ea24a17
    name: gatling
    scripts:
@@ -92,14 +92,14 @@ virtualMachines:
 scenarios:
   - !scenario
     name: 4_c3_large
-    id: 3
+    id: 8
     endable: false
     workload: !workload
      targets:
       - *gatling
      functions:
       - !workloadFunction
-       values: "200"
+       values: "100"
     metric:
       nginx : *nginx
       mysql : *mysql
@@ -124,7 +124,7 @@ scenarios:
             !scriptlet
               scripts:
                 - "sudo service logstash-indexer stop"
-        wordpress2 : &wordpress2 !virtualMachine
+      wordpress2 : &wordpress2 !virtualMachine
         id: 5
         providerId: us-east-1/i-67757e36
         type: *c3_large
@@ -145,7 +145,7 @@ scenarios:
             !scriptlet
               scripts:
                 - "sudo service logstash-indexer stop"
-        wordpress3 : &wordpress3 !virtualMachine
+      wordpress3 : &wordpress3 !virtualMachine
         id: 6
         providerId: us-east-1/i-e8767db9
         type: *c3_large
@@ -166,10 +166,313 @@ scenarios:
             !scriptlet
               scripts:
                 - "sudo service logstash-indexer stop"
-        wordpress4 : &wordpress4 !virtualMachine
+      wordpress4 : &wordpress4 !virtualMachine
         id: 7
         providerId: us-east-1/i-bb767dea
         type: *c3_large
+        name: wordpress        
+        scripts:
+          start_vm : 
+            !scriptlet
+             scripts :
+              - "~/change_database.sh ${scenarioScope.metric(mysql).publicIpAddress}"
+              - "~/configHost.sh ${scenarioScope.metric(nginx).publicIpAddress}"
+              - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(gatling).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+          start_metric : 
+            !scriptlet
+              scripts:
+               - "~/configMetric.sh ${scenarioScope.name}"
+               - "sudo service apache2 restart"
+          stop_metric : 
+            !scriptlet
+              scripts:
+                - "sudo service logstash-indexer stop"
+    virtualMachines:
+      gatling : *gatling
+      mysql : *mysql
+      nginx : *nginx
+  - !scenario
+    name: 4_c3_large
+    id: 3
+    endable: false
+    workload: !workload
+     targets:
+      - *gatling
+     functions:
+      - !workloadFunction
+       values: "100 200 300 400 500 600 700 800 900 1000"
+    metric:
+      nginx : *nginx
+      mysql : *mysql
+      wordpress : &wordpress !virtualMachine
+        id: 4
+        providerId: us-east-1/i-5f32c77e
+        type: *c3_large
+        name: wordpress        
+        scripts:
+          start_vm : 
+            !scriptlet
+             scripts :
+              - "~/change_database.sh ${scenarioScope.metric(mysql).publicIpAddress}"
+              - "~/configHost.sh ${scenarioScope.metric(nginx).publicIpAddress}"
+              - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(gatling).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+          start_metric : 
+            !scriptlet
+              scripts:
+               - "~/configMetric.sh ${scenarioScope.name}"
+               - "sudo service apache2 restart"
+          stop_metric : 
+            !scriptlet
+              scripts:
+                - "sudo service logstash-indexer stop"
+      wordpress2 : &wordpress2 !virtualMachine
+        id: 5
+        providerId: us-east-1/i-67757e36
+        type: *c3_large
+        name: wordpress        
+        scripts:
+          start_vm : 
+            !scriptlet
+             scripts :
+              - "~/change_database.sh ${scenarioScope.metric(mysql).publicIpAddress}"
+              - "~/configHost.sh ${scenarioScope.metric(nginx).publicIpAddress}"
+              - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(gatling).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+          start_metric : 
+            !scriptlet
+              scripts:
+               - "~/configMetric.sh ${scenarioScope.name}"
+               - "sudo service apache2 restart"
+          stop_metric : 
+            !scriptlet
+              scripts:
+                - "sudo service logstash-indexer stop"
+      wordpress3 : &wordpress3 !virtualMachine
+        id: 6
+        providerId: us-east-1/i-e8767db9
+        type: *c3_large
+        name: wordpress        
+        scripts:
+          start_vm : 
+            !scriptlet
+             scripts :
+              - "~/change_database.sh ${scenarioScope.metric(mysql).publicIpAddress}"
+              - "~/configHost.sh ${scenarioScope.metric(nginx).publicIpAddress}"
+              - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(gatling).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+          start_metric : 
+            !scriptlet
+              scripts:
+               - "~/configMetric.sh ${scenarioScope.name}"
+               - "sudo service apache2 restart"
+          stop_metric : 
+            !scriptlet
+              scripts:
+                - "sudo service logstash-indexer stop"
+      wordpress4 : &wordpress4 !virtualMachine
+        id: 7
+        providerId: us-east-1/i-bb767dea
+        type: *c3_large
+        name: wordpress        
+        scripts:
+          start_vm : 
+            !scriptlet
+             scripts :
+              - "~/change_database.sh ${scenarioScope.metric(mysql).publicIpAddress}"
+              - "~/configHost.sh ${scenarioScope.metric(nginx).publicIpAddress}"
+              - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(gatling).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+          start_metric : 
+            !scriptlet
+              scripts:
+               - "~/configMetric.sh ${scenarioScope.name}"
+               - "sudo service apache2 restart"
+          stop_metric : 
+            !scriptlet
+              scripts:
+                - "sudo service logstash-indexer stop"
+    virtualMachines:
+      gatling : *gatling
+      mysql : *mysql
+      nginx : *nginx
+  - !scenario
+    name: 4_c3_xlarge
+    id: 4
+    endable: false
+    workload: !workload
+     targets:
+      - *gatling
+     functions:
+      - !workloadFunction
+       values: "100 200 300 400 500 600 700 800 900 1000"
+    metric:
+      nginx : *nginx
+      mysql : *mysql
+      wordpress : &wordpress !virtualMachine
+        id: 4
+        providerId: us-east-1/i-5f32c77e
+        type: *c3_xlarge
+        name: wordpress        
+        scripts:
+          start_vm : 
+            !scriptlet
+             scripts :
+              - "~/change_database.sh ${scenarioScope.metric(mysql).publicIpAddress}"
+              - "~/configHost.sh ${scenarioScope.metric(nginx).publicIpAddress}"
+              - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(gatling).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+          start_metric : 
+            !scriptlet
+              scripts:
+               - "~/configMetric.sh ${scenarioScope.name}"
+               - "sudo service apache2 restart"
+          stop_metric : 
+            !scriptlet
+              scripts:
+                - "sudo service logstash-indexer stop"
+      wordpress2 : &wordpress2 !virtualMachine
+        id: 5
+        providerId: us-east-1/i-67757e36
+        type: *c3_xlarge
+        name: wordpress        
+        scripts:
+          start_vm : 
+            !scriptlet
+             scripts :
+              - "~/change_database.sh ${scenarioScope.metric(mysql).publicIpAddress}"
+              - "~/configHost.sh ${scenarioScope.metric(nginx).publicIpAddress}"
+              - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(gatling).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+          start_metric : 
+            !scriptlet
+              scripts:
+               - "~/configMetric.sh ${scenarioScope.name}"
+               - "sudo service apache2 restart"
+          stop_metric : 
+            !scriptlet
+              scripts:
+                - "sudo service logstash-indexer stop"
+      wordpress3 : &wordpress3 !virtualMachine
+        id: 6
+        providerId: us-east-1/i-e8767db9
+        type: *c3_xlarge
+        name: wordpress        
+        scripts:
+          start_vm : 
+            !scriptlet
+             scripts :
+              - "~/change_database.sh ${scenarioScope.metric(mysql).publicIpAddress}"
+              - "~/configHost.sh ${scenarioScope.metric(nginx).publicIpAddress}"
+              - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(gatling).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+          start_metric : 
+            !scriptlet
+              scripts:
+               - "~/configMetric.sh ${scenarioScope.name}"
+               - "sudo service apache2 restart"
+          stop_metric : 
+            !scriptlet
+              scripts:
+                - "sudo service logstash-indexer stop"
+      wordpress4 : &wordpress4 !virtualMachine
+        id: 7
+        providerId: us-east-1/i-bb767dea
+        type: *c3_xlarge
+        name: wordpress        
+        scripts:
+          start_vm : 
+            !scriptlet
+             scripts :
+              - "~/change_database.sh ${scenarioScope.metric(mysql).publicIpAddress}"
+              - "~/configHost.sh ${scenarioScope.metric(nginx).publicIpAddress}"
+              - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(gatling).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+          start_metric : 
+            !scriptlet
+              scripts:
+               - "~/configMetric.sh ${scenarioScope.name}"
+               - "sudo service apache2 restart"
+          stop_metric : 
+            !scriptlet
+              scripts:
+                - "sudo service logstash-indexer stop"
+    virtualMachines:
+      gatling : *gatling
+      mysql : *mysql
+      nginx : *nginx
+  - !scenario
+    name: 4_c3_2xlarge
+    id: 5
+    endable: false
+    workload: !workload
+     targets:
+      - *gatling
+     functions:
+      - !workloadFunction
+       values: "100 200 300 400 500 600 700 800 900 1000"
+    metric:
+      nginx : *nginx
+      mysql : *mysql
+      wordpress : &wordpress !virtualMachine
+        id: 4
+        providerId: us-east-1/i-5f32c77e
+        type: *c3_2xlarge
+        name: wordpress        
+        scripts:
+          start_vm : 
+            !scriptlet
+             scripts :
+              - "~/change_database.sh ${scenarioScope.metric(mysql).publicIpAddress}"
+              - "~/configHost.sh ${scenarioScope.metric(nginx).publicIpAddress}"
+              - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(gatling).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+          start_metric : 
+            !scriptlet
+              scripts:
+               - "~/configMetric.sh ${scenarioScope.name}"
+               - "sudo service apache2 restart"
+          stop_metric : 
+            !scriptlet
+              scripts:
+                - "sudo service logstash-indexer stop"
+      wordpress2 : &wordpress2 !virtualMachine
+        id: 5
+        providerId: us-east-1/i-67757e36
+        type: *c3_2xlarge
+        name: wordpress        
+        scripts:
+          start_vm : 
+            !scriptlet
+             scripts :
+              - "~/change_database.sh ${scenarioScope.metric(mysql).publicIpAddress}"
+              - "~/configHost.sh ${scenarioScope.metric(nginx).publicIpAddress}"
+              - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(gatling).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+          start_metric : 
+            !scriptlet
+              scripts:
+               - "~/configMetric.sh ${scenarioScope.name}"
+               - "sudo service apache2 restart"
+          stop_metric : 
+            !scriptlet
+              scripts:
+                - "sudo service logstash-indexer stop"
+      wordpress3 : &wordpress3 !virtualMachine
+        id: 6
+        providerId: us-east-1/i-e8767db9
+        type: *c3_2xlarge
+        name: wordpress        
+        scripts:
+          start_vm : 
+            !scriptlet
+             scripts :
+              - "~/change_database.sh ${scenarioScope.metric(mysql).publicIpAddress}"
+              - "~/configHost.sh ${scenarioScope.metric(nginx).publicIpAddress}"
+              - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(gatling).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+          start_metric : 
+            !scriptlet
+              scripts:
+               - "~/configMetric.sh ${scenarioScope.name}"
+               - "sudo service apache2 restart"
+          stop_metric : 
+            !scriptlet
+              scripts:
+                - "sudo service logstash-indexer stop"
+      wordpress4 : &wordpress4 !virtualMachine
+        id: 7
+        providerId: us-east-1/i-bb767dea
+        type: *c3_2xlarge
         name: wordpress        
         scripts:
           start_vm : 
