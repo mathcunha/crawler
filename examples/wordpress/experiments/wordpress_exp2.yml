@@ -1,8 +1,8 @@
 !benchmark
-id: 1
+id: 2
 name: SimplePost
 rounds: 1
-endable: false
+endable: true
 
 providers:
 #Os provedores de nuvem utilizados
@@ -19,12 +19,21 @@ virtualMachineTypes:
  - &c3_large !virtualMachineType
     providerProfile: c3.large
     provider: *ec2
+    properties:
+      ServerLimit : 300
+      StartServers : 200
  - &c3_xlarge !virtualMachineType
     providerProfile: c3.xlarge
     provider: *ec2
+    properties:
+      ServerLimit : 550
+      StartServers : 450
  - &c3_2xlarge !virtualMachineType
     providerProfile: c3.2xlarge
     provider: *ec2
+    properties:
+      ServerLimit : 800
+      StartServers : 700
  - &m3_large !virtualMachineType
     providerProfile: m3.large
     provider: *ec2
@@ -41,6 +50,14 @@ properties:
     &test_parser !scriptlet
      scripts:
       - "echo '${scenarioScope.virtualMachines(wordpress).privateIpAddress}'>> /tmp/testip"
+   start_apache :
+    &start_apache !scriptlet
+     scripts :
+      - "sudo sed -i 's;^       ServerLimit.*;       ServerLimit       ${type.properties(ServerLimit)};g' /etc/apache2/mods-available/mpm_prefork.conf"
+      - "sudo sed -i 's;^       MaxRequestWorkers.*;       MaxRequestWorkers       ${type.properties(ServerLimit)};g' /etc/apache2/mods-available/mpm_prefork.conf"
+      - "~/change_database.sh ${scenarioScope.metric(mysql).privateIpAddress}"
+      - "~/configHost.sh ${scenarioScope.metric(nginx).privateIpAddress}"
+      - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(gatling).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
   
 virtualMachines:
  - &gatling !virtualMachine
@@ -99,7 +116,7 @@ scenarios:
       - *gatling
      functions:
       - !workloadFunction
-       values: "100,200,300,400"
+       values: "200,300,400,500"
     metric:
       nginx : *nginx
       mysql : *mysql
@@ -109,14 +126,7 @@ scenarios:
         type: *c3_large
         name: wordpress        
         scripts:
-          start_vm : 
-            !scriptlet
-             scripts :
-              - "sudo sed -i 's;^       ServerLimit.*;       ServerLimit       300;g' /etc/apache2/mods-available/mpm_prefork.conf"
-              - "sudo sed -i 's;^       MaxRequestWorkers.*;       MaxRequestWorkers       300;g' /etc/apache2/mods-available/mpm_prefork.conf"
-              - "~/change_database.sh ${scenarioScope.metric(mysql).privateIpAddress}"
-              - "~/configHost.sh ${scenarioScope.metric(nginx).privateIpAddress}"
-              - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(gatling).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+          start_vm : *start_apache
           start_metric : 
             !scriptlet
               scripts:
@@ -139,7 +149,7 @@ scenarios:
       - *gatling
      functions:
       - !workloadFunction
-       values: "100,200,300,400,500,600"
+       values: "400,500,600,700"
     metric:
       nginx : *nginx
       mysql : *mysql
@@ -149,14 +159,7 @@ scenarios:
         type: *c3_xlarge
         name: wordpress        
         scripts:
-          start_vm : 
-            !scriptlet
-             scripts :
-              - "sudo sed -i 's;^       ServerLimit.*;       ServerLimit       550;g' /etc/apache2/mods-available/mpm_prefork.conf"
-              - "sudo sed -i 's;^       MaxRequestWorkers.*;       MaxRequestWorkers       550;g' /etc/apache2/mods-available/mpm_prefork.conf"
-              - "~/change_database.sh ${scenarioScope.metric(mysql).privateIpAddress}"
-              - "~/configHost.sh ${scenarioScope.metric(nginx).privateIpAddress}"
-              - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(gatling).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+          start_vm : *start_apache
           start_metric : 
             !scriptlet
               scripts:
@@ -173,13 +176,13 @@ scenarios:
   - !scenario
     name: 1_c3_2xlarge
     id: 1
-    endable: false
+    endable: true
     workload: !workload
      targets:
       - *gatling
      functions:
       - !workloadFunction
-       values: "100,200,300,400,500,600,700,800,900"
+       values: "500,600,700,800,900"
     metric:
       nginx : *nginx
       mysql : *mysql
@@ -189,14 +192,7 @@ scenarios:
         type: *c3_2xlarge
         name: wordpress        
         scripts:
-          start_vm : 
-            !scriptlet
-             scripts :
-              - "sudo sed -i 's;^       ServerLimit.*;       ServerLimit       800;g' /etc/apache2/mods-available/mpm_prefork.conf"
-              - "sudo sed -i 's;^       MaxRequestWorkers.*;       MaxRequestWorkers       800;g' /etc/apache2/mods-available/mpm_prefork.conf"
-              - "~/change_database.sh ${scenarioScope.metric(mysql).privateIpAddress}"
-              - "~/configHost.sh ${scenarioScope.metric(nginx).privateIpAddress}"
-              - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(gatling).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+          start_vm : *start_apache
           start_metric : 
             !scriptlet
               scripts:

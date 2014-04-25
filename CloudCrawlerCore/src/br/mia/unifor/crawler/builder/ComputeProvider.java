@@ -190,10 +190,10 @@ public abstract class ComputeProvider {
 
 		} else {
 			//Jclouds bug - https://issues.apache.org/jira/browse/JCLOUDS-503
-			String hardware = "c3.large"; 
-			if(metadata.getHardware() != null){
-				hardware = metadata.getHardware().getId();
-			}
+			String hardware = metadata.getHardware().getId();
+			//if(metadata.getHardware() != null){
+			//	hardware = metadata.getHardware().getId();
+			//}
 			if (!hardware.equals(instance.getType().getProviderProfile())) {
 				stopInstance(instance);
 
@@ -249,10 +249,10 @@ public abstract class ComputeProvider {
 	public boolean changeInstanceType(VirtualMachine instance,
 			NodeMetadata metadata) {
 		//Jclouds bug - https://issues.apache.org/jira/browse/JCLOUDS-503
-		String hardware = "c3.large"; 
-		if(metadata.getHardware() != null){
-			hardware = metadata.getHardware().getId();
-		}
+		String hardware = metadata.getHardware().getId();
+		//if(metadata.getHardware() != null){
+		//	hardware = metadata.getHardware().getId();
+		//}
 
 		if (!hardware.equals(instance.getType().getProviderProfile())) {
 			logger.info("change instance resource " + instance.getProviderId());
