@@ -23,10 +23,10 @@ public class ConsoleTailerListener extends TailerListenerAdapter {
 		this.properties = properties;
 	}
 	
-	public void handle(String line) {
+	/*public void handle(String line) {
 		String body = "{\"author\":\"system\",\"message\":\""+line+"\"}";
 		publishResult(body, "http://" + "127.0.0.1" + ":"+ properties.getProperty("port")+"/CloudCrawler/console");
-	}
+	}*/
 
 	public void publishResult(String body,
 			String httpEndPoint) {

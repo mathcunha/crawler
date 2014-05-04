@@ -1,13 +1,14 @@
 package br.mia.unifor.crawler.executer.artifact;
 
 
+import java.util.Hashtable;
 import java.util.Map;
 
 
 public class VirtualMachine extends CrawlerArtifact{
 	private VirtualMachineType type;
 	private String name;
-	private Map<String, Scriptlet> scripts;
+	private Map<String, Scriptlet> scripts = new Hashtable<String, Scriptlet>(0);
 	private Boolean temporary = false;
 	private String image;
 	private String providerId;
