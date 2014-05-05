@@ -53,6 +53,7 @@ properties:
    start_apache :
     &start_apache !scriptlet
      scripts :
+      - "sudo sed -i 's;^       StartServers.*;       StartServers       ${type.properties(StartServers)};g' /etc/apache2/mods-available/mpm_prefork.conf"
       - "sudo sed -i 's;^       ServerLimit.*;       ServerLimit       ${type.properties(ServerLimit)};g' /etc/apache2/mods-available/mpm_prefork.conf"
       - "sudo sed -i 's;^       MaxRequestWorkers.*;       MaxRequestWorkers       ${type.properties(ServerLimit)};g' /etc/apache2/mods-available/mpm_prefork.conf"
       - "~/change_database.sh ${scenarioScope.metric(mysql).privateIpAddress}"
@@ -122,7 +123,7 @@ scenarios:
       mysql : *mysql
       wordpress : &wordpress !virtualMachine
         id: 4
-        providerId: us-east-1/i-5f32c77e
+        providerId: us-east-1/i-cffa379f
         type: *c3_large
         name: wordpress        
         scripts:
@@ -155,7 +156,7 @@ scenarios:
       mysql : *mysql
       wordpress : &wordpress !virtualMachine
         id: 4
-        providerId: us-east-1/i-5f32c77e
+        providerId: us-east-1/i-cffa379f
         type: *c3_xlarge
         name: wordpress        
         scripts:
@@ -188,7 +189,7 @@ scenarios:
       mysql : *mysql
       wordpress : &wordpress !virtualMachine
         id: 4
-        providerId: us-east-1/i-5f32c77e
+        providerId: us-east-1/i-cffa379f
         type: *c3_2xlarge
         name: wordpress        
         scripts:

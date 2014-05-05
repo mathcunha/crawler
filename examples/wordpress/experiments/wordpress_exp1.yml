@@ -40,6 +40,9 @@ virtualMachineTypes:
  - &m3_xlarge !virtualMachineType
     providerProfile: m3.xlarge
     provider: *ec2
+ - &m3_2xlarge !virtualMachineType
+    providerProfile: m3.2xlarge
+    provider: *ec2
 
 properties:
    chef_script_wordpress : 
@@ -79,10 +82,12 @@ virtualMachines:
    providerId: us-east-1/i-f9abd6d7
    type: *c3_large
    name: crawler
+   scripts:
+    start_metric : *test_parser
  - &mysql !virtualMachine
    id: 3
    providerId: us-east-1/i-0dfb042c
-   type: *m3_xlarge
+   type: *m3_2xlarge
    name: mysql
    scripts:
     start_metric : 
@@ -117,7 +122,7 @@ virtualMachines:
 
 scenarios:
   - !scenario
-    name: 4_c3_large
+    name: 4_c3_xlarge
     id: 1
     endable: false
     workload: !workload
@@ -125,14 +130,15 @@ scenarios:
       - *gatling
      functions:
       - !workloadFunction
-       values: "100,200,300,400,500,600,700,800,900,1000"
+       values: "1000"
     metric:
       nginx : *nginx
       mysql : *mysql
+      gatling : *gatling
       wordpress : &wordpress !virtualMachine
         id: 5
         providerId: us-east-1/i-cffa379f
-        type: *c3_large
+        type: *c3_xlarge
         name: wordpress        
         scripts:
           start_vm : *start_apache
@@ -148,7 +154,7 @@ scenarios:
       wordpress2 : &wordpress !virtualMachine
         id: 6
         providerId: us-east-1/i-eb24e9bb
-        type: *c3_large
+        type: *c3_xlarge
         name: wordpress        
         scripts:
           start_vm : *start_apache
@@ -164,7 +170,7 @@ scenarios:
       wordpress3 : &wordpress !virtualMachine
         id: 7
         providerId: us-east-1/i-8077bad0
-        type: *c3_large
+        type: *c3_xlarge
         name: wordpress        
         scripts:
           start_vm : *start_apache
@@ -180,7 +186,7 @@ scenarios:
       wordpress4 : &wordpress !virtualMachine
         id: 8
         providerId: us-east-1/i-998844c9
-        type: *c3_large
+        type: *c3_xlarge
         name: wordpress        
         scripts:
           start_vm : *start_apache
