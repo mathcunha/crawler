@@ -18,7 +18,7 @@ class DurationPost extends Simulation{
                         .userAgentHeader("Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.76 Safari/537.36")
 
         val scn = scenario("Scenario Name")
-                .duration(300){
+                .during(6 minutes){
                         exec(http("new post")
                                         .post("/xmlrpc.php")
                                         .body("<?xml version='1.0'?> <methodCall> <methodName>blogger.newPost</methodName> <params> <param> <value>not empty</value> </param> <param> <value>not empty</value> </param> <param> <value>crawler-admin</value> </param> <param> <value>crawler-admin</value> </param>  <param> <value> segundo post xmlrpc ${post_id} matheus</value> </param>  <param> <value>true</value> </param> </params> </methodCall>")
@@ -49,5 +49,5 @@ class DurationPost extends Simulation{
                         )
                 }
 
-        setUp(scn.users(1000).ramp(100).protocolConfig(httpConf))
+        setUp(scn.users(1000).ramp(1 minutes).protocolConfig(httpConf))
 }
