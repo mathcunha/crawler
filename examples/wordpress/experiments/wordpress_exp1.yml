@@ -69,13 +69,10 @@ virtualMachines:
    providerId: us-east-1/i-0f577d5c
    type: *m3_xlarge
    name: gatling
-   scripts:
-    start_metric : 
-      !scriptlet
-         scripts:
-          - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(crawler).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+   scripts:    
     submit_workload : !scriptlet
       scripts:
+       - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(crawler).privateIpAddress};g" /home/ubuntu/logstash_metrics/metric_colector_application.conf'
        - "~/execution.sh ${scenarioScope.metric(nginx).privateIpAddress} ${scenarioScope.name}"
  - &crawler !virtualMachine
    id: 2
@@ -134,7 +131,6 @@ scenarios:
     metric:
       nginx : *nginx
       mysql : *mysql
-      gatling : *gatling
       wordpress : &wordpress !virtualMachine
         id: 5
         providerId: us-east-1/i-cffa379f
@@ -203,3 +199,4 @@ scenarios:
       crawler : *crawler
       mysql : *mysql
       nginx : *nginx
+      gatling : *gatling

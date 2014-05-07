@@ -49,5 +49,5 @@ class DurationPost extends Simulation{
                         )
                 }
 
-        setUp(scn.users(1000).ramp(1 minutes).protocolConfig(httpConf))
+        setUp(scn.users(1000).ramp(10).protocolConfig(httpConf))
 }
