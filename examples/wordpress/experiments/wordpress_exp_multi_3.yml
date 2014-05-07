@@ -2,7 +2,7 @@
 id: 3
 name: SimplePost
 rounds: 1
-endable: true
+endable: false
 
 providers:
 #Os provedores de nuvem utilizados
@@ -127,7 +127,7 @@ scenarios:
       - *gatling
      functions:
       - !workloadFunction
-       values: "100,200,300,400,500,600,700,800,900,1000,2000"
+       values: "100,200,300,400,500,600,700,800,900,1000"
     metric:
       nginx : *nginx
       mysql : *mysql
@@ -193,7 +193,7 @@ scenarios:
       - *gatling
      functions:
       - !workloadFunction
-       values: "100,200,300,400,500,600,700,800,900,1000,2000"
+       values: "100,200,300,400,500,600,700,800,900,1000"
     metric:
       nginx : *nginx
       mysql : *mysql
@@ -259,7 +259,7 @@ scenarios:
       - *gatling
      functions:
       - !workloadFunction
-       values: "100,200,300,400,500,600,700,800,900,1000,2000"
+       values: "100,200,300,400,500,600,700,800,900,1000"
     metric:
       nginx : *nginx
       mysql : *mysql

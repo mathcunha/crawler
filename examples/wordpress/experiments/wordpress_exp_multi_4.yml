@@ -2,7 +2,7 @@
 id: 4
 name: SimplePost
 rounds: 1
-endable: true
+endable: false
 
 providers:
 #Os provedores de nuvem utilizados
