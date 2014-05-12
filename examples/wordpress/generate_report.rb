@@ -4,7 +4,7 @@ require 'logger'
 
 class GenerateReport
 
-  def initialize(server_ip:'54.234.21.202', server_port:9200)
+  def initialize(server_ip:'54.82.195.19', server_port:9200)
      @server_ip = server_ip
      @server_port = server_port
      @workloads = [100,200,300,400,500,600,700,800,900,1000]
@@ -28,6 +28,7 @@ class GenerateReport
   def get_statistics(scenario, workload)
     uri = URI("http://#{@server_ip}:#{@server_port}/_search?pretty=1")
     req = Net::HTTP::Post.new(uri)#, initheader = {'Content-Type' =>'text/plain'})
+    #req.body = get_body_rt_gt_0(scenario, workload)
     req.body = get_body(scenario, workload)
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|
       http.request(req)
@@ -45,7 +46,7 @@ class GenerateReport
 	body += "                  \"type\" : \"results\"\n"
 	body += "               }\n"
 	body += "            },\n"
-	body += "			{\n"
+	body += "	     {\n"
 	body += "               \"term\" : {\n"
 	body += "                  \"scenario\" : \"#{scenario}\"\n"
 	body += "               }\n"
@@ -55,6 +56,12 @@ class GenerateReport
 	body += "                  \"workload\" : \"#{workload}\"\n"
 	body += "               }\n"
 	body += "            }\n"
+#        body += "	     ,{\n"
+#	body += "		 \"query_string\" : {\n"
+#        body += "                 \"fields\" : [\"status\"],\n"
+#        body += "                 \"query\" : \"OK\"\n"
+#        body += "                }\n"
+#	body += "	     }\n"
 	body += "         ]\n"
 	body += "      }\n"
 	body += "   },\n"
@@ -68,6 +75,47 @@ class GenerateReport
 	body += "        }\n"
 	body += "    }\n"
 	body += "}"
+  end
+
+  def get_body_rt_gt_0(scenario, workload)
+     body = ""
+        body += "{\n"
+        body += "   \"query\" : {\n"
+        body += "      \"bool\" : {\n"
+        body += "         \"must\" : [            \n"
+        body += "            {\n"
+        body += "               \"term\" : {\n"
+        body += "                  \"type\" : \"results\"\n"
+        body += "               }\n"
+        body += "            },\n"
+        body += "            {\n"
+        body += "               \"term\" : {\n"
+        body += "                  \"scenario\" : \"#{scenario}\"\n"
+        body += "               }\n"
+        body += "            },\n"
+        body += "                       {\n"
+        body += "               \"term\" : {\n"
+        body += "                  \"workload\" : \"#{workload}\"\n"
+        body += "               }\n"
+        body += "            },\n"
+        body += "            {\n"
+        body += "                \"range\" : {\n"
+        body += "                  \"response_time\" : {\"gt\" : 0.0} \n"
+        body += "                }\n"
+        body += "            }\n"
+        body += "         ]\n"
+        body += "      }\n"
+        body += "   },\n"
+        body += "   \"from\" : 0,\n"
+        body += "   \"size\" : 0,\n"
+        body += "   \"facets\" : {\n"
+        body += "        \"stat1\" : {\n"
+        body += "            \"statistical\" : {\n"
+        body += "                \"field\" : \"response_time\"\n"
+        body += "            }\n"
+        body += "        }\n"
+        body += "    }\n"
+        body += "}"
   end
 end
 
