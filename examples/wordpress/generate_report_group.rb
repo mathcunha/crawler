@@ -9,12 +9,12 @@ class GenerateReport
      @server_port = server_port
      @workloads = [100,200,300,400,500,600,700,800,900,1000]
      @profile_ids = ['c3_large', 'c3_xlarge', 'c3_2xlarge']
-     @requests = ['new post', 'view post', 'edit post', 'find posts']
      @logger = Logger.new('logfile.log')
   end
 
   def run
-    puts "provider_id,workload,request,response_time,id"
+    puts "provider_id,workload,response_time"
+    requests = ['new post', 'view post', 'edit post', 'find posts', 'edit post']
     for j in 1..4
       @profile_ids.each do |profile_id|
         @workloads.each do |workload|
@@ -22,10 +22,30 @@ class GenerateReport
            total = obj["hits"]["total"].to_i
            i = 0
            step = 200
+           indexer = 0
+           response_time = 0
            while i < total do
-             obj = get_results("#{j}_#{profile_id}",workload, i, i + step)
-             #puts "#{j}_#{profile_id},#{obj["hits"]["hits"][1]["_source"]["workload"]},\"#{obj["hits"]["hits"][1]["_source"]["request"]}\",#{obj["hits"]["hits"][1]["_source"]["response_time"]},#{obj["hits"]["hits"][1]["id"]}"
-             load_results(obj)
+             obj = get_results("#{j}_#{profile_id}",workload, i, step)
+             
+             #load_results(obj)
+             
+             obj["hits"]["hits"].each do |result|
+               if requests[indexer].eql?(result["_source"]["request"])
+                 indexer+=1
+                 response_time += result["_source"]["response_time"]
+               else
+                 @logger.info ("\"#{result["_source"]["scenario"]}\", #{requests[indexer]}, #{result["_source"]["request"]}, #{i}, #{result["_source"]["workload"]}")
+                 indexer = 0
+                 response_time = 0
+               end
+
+               if indexer == requests.length 
+                 puts "\"#{result["_source"]["scenario"]}\",#{result["_source"]["workload"]},#{response_time}"
+                 indexer = 0
+                 response_time = 0
+               end
+             end
+             
              i += step
           end
         end
@@ -36,7 +56,6 @@ class GenerateReport
   def load_results(results)
     results["hits"]["hits"].each do |result|
       puts "\"#{result["_source"]["scenario"]}\",#{result["_source"]["workload"]},\"#{result["_source"]["request"]}\",#{result["_source"]["response_time"]}"
-
     end
   end
 
