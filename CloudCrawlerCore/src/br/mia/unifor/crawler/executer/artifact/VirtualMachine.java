@@ -1,7 +1,6 @@
 package br.mia.unifor.crawler.executer.artifact;
 
 
-import java.util.Hashtable;
 import java.util.Map;
 
 

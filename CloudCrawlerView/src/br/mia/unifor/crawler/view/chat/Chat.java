@@ -17,8 +17,6 @@ package br.mia.unifor.crawler.view.chat;
 
 import org.atmosphere.config.service.ManagedService;
 import org.atmosphere.config.service.Message;
-import org.atmosphere.cpr.AtmosphereResponse;
-import org.atmosphere.handler.OnMessage;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;

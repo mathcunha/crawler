@@ -12,7 +12,6 @@ import org.hornetq.api.core.client.ClientSession;
 
 import br.mia.unifor.crawler.executer.artifact.Benchmark;
 import br.mia.unifor.crawler.executer.artifact.Scenario;
-import br.mia.unifor.crawler.executer.artifact.Workload;
 import br.mia.unifor.crawler.executer.artifact.WorkloadFunction;
 import br.mia.unifor.crawlerenvironment.mom.event.BenchmarkEvent;
 import br.mia.unifor.crawlerenvironment.mom.event.CloudCrawlerEnvironmentEvent;

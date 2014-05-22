@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.mia.unifor.crawler.executer.artifact.Benchmark;
-import br.mia.unifor.crawler.executer.artifact.Provider;
 import br.mia.unifor.crawler.executer.artifact.Scenario;
 import br.mia.unifor.crawler.executer.artifact.VirtualMachine;
 
@@ -14,11 +13,11 @@ public class ValidationEngine {
 	public static void validate(Benchmark benchmark) throws ValidationException, FileNotFoundException, IOException{
 		StringBuffer buffer = new StringBuffer();
 		
-		boolean deployment = validateVirtualMachines(benchmark.getVirtualMachines(), buffer);		
+		validateVirtualMachines(benchmark.getVirtualMachines(), buffer);		
 		
 		for (Scenario scenario : benchmark.getScenarios()) {
 			validateScenario(scenario, buffer);
-			validateVirtualMachines(new ArrayList<VirtualMachine>(scenario.getVirtualMachines().values()), buffer);
+			validateVirtualMachines(new ArrayList<VirtualMachine>(scenario.getLocalVirtualMachines()), buffer);
 		}
 		
 		if(buffer.length() > 0){//has errors
@@ -56,7 +55,7 @@ public class ValidationEngine {
 		StringBuffer buffer = new StringBuffer();
 		
 		validateScenario(scenario, buffer);
-		validateVirtualMachines(new ArrayList<VirtualMachine>(scenario.getVirtualMachines().values()), buffer);
+		validateVirtualMachines(new ArrayList<VirtualMachine>(scenario.getLocalVirtualMachines()), buffer);
 		
 		if(buffer.length() > 0){//has errors
 			throw new ValidationException(buffer.toString());

@@ -69,8 +69,7 @@ public class EngineAsync {
 	}
 
 	public static void startInstances(Scenario scenario) throws CrawlException {
-		startInstances(scenario, scenario.getVirtualMachines().values());
-		startInstances(scenario, scenario.getMetric().values());
+		startInstances(scenario, scenario.getLocalVirtualMachines());		
 	}
 
 	private static void startInstances(Scenario scenario,
@@ -90,7 +89,7 @@ public class EngineAsync {
 
 	public static void stopLocalInstances(Scenario scenario, Benchmark benchmark)
 			throws CrawlException {
-		List<VirtualMachine> instances = new ArrayList<VirtualMachine>(scenario.getVirtualMachines().values());
+		List<VirtualMachine> instances = new ArrayList<VirtualMachine>(scenario.getLocalVirtualMachines());
 
 		// removendo as instancias globais
 		for (int i = 0; i < instances.size(); ++i) {

@@ -1,13 +1,15 @@
 package br.mia.unifor.crawler.executer.artifact;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class Scenario extends CrawlerArtifact{
 	private Workload workload;	
 	private Map<String, VirtualMachine> metric;
 	private String name;
 	private Boolean endable = Boolean.TRUE;
-	private Map<String, VirtualMachine> virtualMachines;
 	
 	
 	@Override
@@ -37,23 +39,9 @@ public class Scenario extends CrawlerArtifact{
 		this.name = name;
 	}
 
-	public Map<String, VirtualMachine> getVirtualMachines() {
-		return virtualMachines;
-	}
-
-	public void setVirtualMachines(Map<String, VirtualMachine> virtualMachines) {
-		this.virtualMachines = virtualMachines;
-	}
-
-
-
-
 	public Map<String, VirtualMachine> getMetric() {
 		return metric;
 	}
-
-
-
 
 	public void setMetric(Map<String, VirtualMachine> metric) {
 		this.metric = metric;
@@ -66,4 +54,11 @@ public class Scenario extends CrawlerArtifact{
 	public void setEndable(Boolean endable) {
 		this.endable = endable;
 	}
+	
+	public Collection<VirtualMachine> getLocalVirtualMachines(){
+		Set<VirtualMachine> virtualMachines = new HashSet<VirtualMachine>(getMetric().values());
+		virtualMachines.addAll(getWorkload().getTargets());
+		return virtualMachines;
+	}
+	
 }
