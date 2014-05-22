@@ -34,15 +34,30 @@ virtualMachineTypes:
     properties:
       ServerLimit : 800
       StartServers : 700
+ - &m3_medium !virtualMachineType
+    providerProfile: m3.medium
+    provider: *ec2
+    properties:
+      ServerLimit : 300
+      StartServers : 201
  - &m3_large !virtualMachineType
     providerProfile: m3.large
     provider: *ec2
+    properties:
+      ServerLimit : 550
+      StartServers : 450
  - &m3_xlarge !virtualMachineType
     providerProfile: m3.xlarge
     provider: *ec2
+    properties:
+      ServerLimit : 800
+      StartServers : 700
  - &m3_2xlarge !virtualMachineType
     providerProfile: m3.2xlarge
     provider: *ec2
+    properties:
+      ServerLimit : 1050
+      StartServers : 950
 
 properties:
    chef_script_wordpress : 
@@ -52,7 +67,7 @@ properties:
    test_parser : 
     &test_parser !scriptlet
      scripts:
-      - "echo '${scenarioScope.virtualMachines(wordpress).privateIpAddress}'>> /tmp/testip"
+      - "echo '${scenarioScope.metric(wordpress).privateIpAddress}'>> /tmp/testip"
    start_apache :
     &start_apache !scriptlet
      scripts :
@@ -61,7 +76,7 @@ properties:
       - "sudo sed -i 's;^       MaxRequestWorkers.*;       MaxRequestWorkers       ${type.properties(ServerLimit)};g' /etc/apache2/mods-available/mpm_prefork.conf"
       - "~/change_database.sh ${scenarioScope.metric(mysql).privateIpAddress}"
       - "~/configHost.sh ${scenarioScope.metric(nginx).privateIpAddress}"
-      - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(crawler).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+      - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.properties(crawler).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
   
 virtualMachines:
  - &gatling !virtualMachine
@@ -72,7 +87,7 @@ virtualMachines:
    scripts:    
     submit_workload : !scriptlet
       scripts:
-       - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(crawler).privateIpAddress};g" /home/ubuntu/logstash_metrics/metric_colector_application.conf'
+       - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.properties(crawler).privateIpAddress};g" /home/ubuntu/logstash_metrics/metric_colector_application.conf'
        - "~/execution.sh ${scenarioScope.metric(nginx).privateIpAddress} ${scenarioScope.name}"
  - &crawler !virtualMachine
    id: 2
@@ -90,7 +105,7 @@ virtualMachines:
     start_metric : 
       !scriptlet
          scripts:
-          - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(crawler).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+          - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.properties(crawler).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
           - "~/clear_db.sh"
           - "~/configMetric.sh ${scenarioScope.name}"
           - "sudo service mysql restart"
@@ -108,7 +123,7 @@ virtualMachines:
     start_metric : 
       !scriptlet
          scripts:
-          - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.virtualMachines(crawler).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+          - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.properties(crawler).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
           - "~/configNginx.sh 4 ${scenarioScope.metric(wordpress).privateIpAddress} ${scenarioScope.metric(wordpress2).privateIpAddress} ${scenarioScope.metric(wordpress3).privateIpAddress} ${scenarioScope.metric(wordpress4).privateIpAddress}"
           - "sudo service nginx restart"
           - "~/configMetric.sh ${scenarioScope.name}"
@@ -197,9 +212,6 @@ scenarios:
                 - "sudo service logstash-indexer stop"
     virtualMachines:
       crawler : *crawler
-      mysql : *mysql
-      nginx : *nginx
-      gatling : *gatling
   - !scenario
     name: 4_m3_large
     id: 1
@@ -279,9 +291,6 @@ scenarios:
                 - "sudo service logstash-indexer stop"
     virtualMachines:
       crawler : *crawler
-      mysql : *mysql
-      nginx : *nginx
-      gatling : *gatling
   - !scenario
     name: 4_m3_xlarge
     id: 1
@@ -361,9 +370,6 @@ scenarios:
                 - "sudo service logstash-indexer stop"
     virtualMachines:
       crawler : *crawler
-      mysql : *mysql
-      nginx : *nginx
-      gatling : *gatling
   - !scenario
     name: 4_m3_2xlarge
     id: 1
@@ -443,6 +449,3 @@ scenarios:
                 - "sudo service logstash-indexer stop"
     virtualMachines:
       crawler : *crawler
-      mysql : *mysql
-      nginx : *nginx
-      gatling : *gatling
