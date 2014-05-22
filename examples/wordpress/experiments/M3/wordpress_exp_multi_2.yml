@@ -2,7 +2,7 @@
 id: 2
 name: SimplePost
 rounds: 1
-endable: false
+endable: true
 
 providers:
 #Os provedores de nuvem utilizados
@@ -286,7 +286,7 @@ scenarios:
   - !scenario
     name: 2_m3_2xlarge
     id: 1
-    endable: false
+    endable: true
     workload: !workload
      targets:
       - *gatling
