@@ -194,7 +194,7 @@ scenarios:
             !scriptlet
               scripts:
                 - "sudo service logstash-indexer stop"
-    virtualMachines:
+    properties:
       crawler : *crawler
   - !scenario
     name: 3_m3_large
@@ -257,7 +257,7 @@ scenarios:
             !scriptlet
               scripts:
                 - "sudo service logstash-indexer stop"
-    virtualMachines:
+    properties:
       crawler : *crawler
   - !scenario
     name: 3_m3_xlarge
@@ -320,7 +320,7 @@ scenarios:
             !scriptlet
               scripts:
                 - "sudo service logstash-indexer stop"
-    virtualMachines:
+    properties:
       crawler : *crawler
   - !scenario
     name: 3_m3_2xlarge
@@ -383,5 +383,5 @@ scenarios:
             !scriptlet
               scripts:
                 - "sudo service logstash-indexer stop"
-    virtualMachines:
+    properties:
       crawler : *crawler
