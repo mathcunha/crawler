@@ -33,7 +33,7 @@ class ResultGroup
   end
 
   def to_s
-    "\"#{@scenario}\",#{@workload},#{@response_time}"
+    "\"#{@scenario}\",#{@workload},#{@response_time},#{@rt_ko},#{@rt_ko},#{length},#{@ok},#{@ko}"
   end
   
   def length

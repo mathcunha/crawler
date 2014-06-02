@@ -9,7 +9,7 @@ class GenerateReport
      @server_ip = server_ip
      @server_port = server_port
      @workloads = [100,200,300,400,500,600,700,800,900,1000]
-     @profile_ids = ['c3_large', 'c3_xlarge', 'c3_2xlarge']
+     @profile_ids = ['m3_medium', 'm3_large', 'm3_xlarge', 'm3_2xlarge','c3_large', 'c3_xlarge', 'c3_2xlarge']
      #@profile_ids = ['m3_medium', 'm3_large', 'm3_xlarge', 'm3_2xlarge']
      @logger = Logger.new('logfile.log')
   end
@@ -35,7 +35,7 @@ class GenerateReport
                if requests[result_group.length].eql?(result["_source"]["request"])
                  result_group.add_request(result)
                else
-                 @logger.info ("\"#{result["_source"]["scenario"]}\", #{requests[indexer]}, #{result["_source"]["request"]}, #{i}, #{result["_source"]["workload"]}")
+                 @logger.info ("\"#{result["_source"]["scenario"]}\", #{requests[result_group.length]}, #{result["_source"]["request"]}, #{i}, #{result["_source"]["workload"]}")
                  result_group = ResultGroup.new(requests, workload, "#{j}_#{profile_id}")
                end
 
@@ -94,12 +94,12 @@ class GenerateReport
 	body += "			   \"term\" : {\n"
 	body += "				  \"workload\" : \"#{workload}\"\n"
 	body += "			   }\n"
-	body += "			},\n"
-	body += "		   {\n"
-	body += "			  \"match_phrase\" : {\n"
-	body += "					 \"status\" : \"OK\"\n"
-	body += "			  }\n"
-	body += "		   }\n"
+	body += "			}\n"
+	#body += "		   ,{\n"
+	#body += "			  \"match_phrase\" : {\n"
+	#body += "					 \"status\" : \"OK\"\n"
+	#body += "			  }\n"
+	#body += "		   }\n"
 	body += "		 ]\n"
 	body += "	  }\n"
 	body += "   },\n"
