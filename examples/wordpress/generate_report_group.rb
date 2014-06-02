@@ -15,7 +15,7 @@ class GenerateReport
   end
 
   def run
-    puts "provider_id,workload,response_time"
+    puts "provider_id,workload,response_time,rt_ok,rt_ko,count,count_ok,count_ko"
     requests = ['new post', 'view post', 'edit post', 'find posts', 'edit post']
     for j in 1..4
       @profile_ids.each do |profile_id|
