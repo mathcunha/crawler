@@ -1,6 +1,7 @@
 require 'json'
 require 'net/http'
 require 'logger'
+require_relative 'result_group.rb'
 
 class GenerateReport
 
@@ -9,6 +10,7 @@ class GenerateReport
      @server_port = server_port
      @workloads = [100,200,300,400,500,600,700,800,900,1000]
      @profile_ids = ['c3_large', 'c3_xlarge', 'c3_2xlarge']
+     #@profile_ids = ['m3_medium', 'm3_large', 'm3_xlarge', 'm3_2xlarge']
      @logger = Logger.new('logfile.log')
   end
 
@@ -22,7 +24,7 @@ class GenerateReport
            total = obj["hits"]["total"].to_i
            i = 0
            step = 200
-           indexer = 0
+           result_group = ResultGroup.new(requests, workload, "#{j}_#{profile_id}")
            response_time = 0
            while i < total do
              obj = get_results("#{j}_#{profile_id}",workload, i, step)
@@ -30,19 +32,17 @@ class GenerateReport
              #load_results(obj)
              
              obj["hits"]["hits"].each do |result|
-               if requests[indexer].eql?(result["_source"]["request"])
-                 indexer+=1
-                 response_time += result["_source"]["response_time"]
+               if requests[result_group.length].eql?(result["_source"]["request"])
+                 result_group.add_request(result)
                else
                  @logger.info ("\"#{result["_source"]["scenario"]}\", #{requests[indexer]}, #{result["_source"]["request"]}, #{i}, #{result["_source"]["workload"]}")
-                 indexer = 0
-                 response_time = 0
+                 result_group = ResultGroup.new(requests, workload, "#{j}_#{profile_id}")
                end
 
-               if indexer == requests.length 
-                 puts "\"#{result["_source"]["scenario"]}\",#{result["_source"]["workload"]},#{response_time}"
-                 indexer = 0
-                 response_time = 0
+               if result_group.length == requests.length 
+                 result_group.summary
+                 puts "#{result_group}"
+                 result_group = ResultGroup.new(requests, workload, "#{j}_#{profile_id}")
                end
              end
              
