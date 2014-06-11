@@ -15,7 +15,7 @@ valores2$fc_cost_user <- factor(valores2$cost_user, order=TRUE)
 valores2$provider_id <- factor(valores2$provider_id, levels = c("m3_m", "c3_l", "m3_l","c3_xl", "m3_xl", "c3_2xl", "m3_2xl"))
 
 ggplot(subset(valores2, percentile < 30000), aes(x=instances, y=provider_id, size=total_price, colour=total_price)) +  facet_grid(. ~ workload)  + ggtitle("90th Response Time < 30 | workload + provider_id + User Cost") + geom_text (aes(label = total_price, angle = 0, hjust=0, vjust=-1), size = 2.5) + theme(legend.position = "none") + geom_point()
-
+ggplot(subset(valores2, percentile < 30000), aes(x=provider_id, y=total_price, fill=total_price)) + facet_grid(instances  ~  workload )+ geom_bar(stat="identity") + coord_flip() + ggtitle("CPU Usage") + guides(size=FALSE)
 
 setwd("M:/users/matheus/mongo/crawler/results_2014_05_24-M3-R1")
 performance = read.csv("performance.csv", header = TRUE, stringsAsFactors = FALSE)
