@@ -1,0 +1,16 @@
+setwd("C:/Users/Matheus/VMS/mongo/crawler/results_2014_05_24-M3-R1")
+performance = read.csv("performance.csv", header = TRUE)
+str(performance)
+performance$workload <- factor(performance$workload, order=TRUE)
+library(ggplot2)
+ggplot(performance, aes(x=cpubusy, y=workload, colour = provider_id)) + facet_grid(. ~ vm_type)+ geom_jitter()
+ggplot(subset(performance, vm_type == "mysql"), aes(x=cpubusy, y=provider_id)) + facet_grid(. ~ workload)+ geom_jitter()
+ggplot(subset(performance, vm_type == "mysql"), aes(x=cpubusy, y=provider_id)) + facet_grid(. ~ workload)+ geom_point()
+
+ggplot(subset(performance, provider_id == "4_m3_2xlarge"), aes(x=cpubusy, y=workload)) + facet_grid(. ~ vm_type)+ geom_jitter()
+ggplot(subset(performance, provider_id == "4_m3_2xlarge"), aes(x=cpubusy, y=workload, colour=cpubusy_fac)) + facet_grid(. ~ vm_type)+ geom_jitter()
+ggplot(subset(performance, vm_type != "nginx"), aes(x=cpubusy, y=provider_id, colour=cpubusy_fac)) + facet_grid(. ~ vm_type * workload)+ geom_jitter()
+
+ggplot(subset(performance, provider_id == "4_m3_2xlarge"), aes(workload, fill=cpubusy_fac)) + facet_grid(. ~ vm_type)+ geom_bar(position="fill")
+ggplot(subset(performance, vm_type != "nginx" & workload > 400), aes(provider_id, fill=cpubusy_fac)) + facet_grid(. ~ vm_type * workload)+ geom_bar(position="fill") + coord_flip()
+ggplot(subset(performance, vm_type != "nginx"), aes(provider_id, fill=cpubusy_fac)) + facet_grid(. ~ vm_type * workload)+ geom_bar(position="fill") + coord_flip() + ggtitle("CPU Usage") + guides(size=FALSE)
