@@ -1,6 +1,6 @@
-setwd("M:/users/matheus/mongo/crawler/results_2014_05_24-M3-R1")
+setwd("M:/users/matheus/mongo/results")
 library(ggplot2)
-valores2 = read.csv("summarized_all_ordered_cost.csv", header = TRUE)
+valores2 = read.csv("summarized_price.csv", header = TRUE, stringsAsFactors = FALSE)
 str(valores2)
 
 valores2$instances <- factor(valores2$instances, order=TRUE)
@@ -17,16 +17,59 @@ valores2$provider_id <- factor(valores2$provider_id, levels = c("m3_m", "c3_l", 
 ggplot(subset(valores2, percentile < 30000), aes(x=instances, y=provider_id, size=total_price, colour=total_price)) +  facet_grid(. ~ workload)  + ggtitle("90th Response Time < 30 | workload + provider_id + User Cost") + geom_text (aes(label = total_price, angle = 0, hjust=0, vjust=-1), size = 2.5) + theme(legend.position = "none") + geom_point()
 ggplot(subset(valores2, percentile < 30000), aes(x=provider_id, y=total_price, fill=total_price)) + facet_grid(instances  ~  workload )+ geom_bar(stat="identity") + coord_flip() + ggtitle("CPU Usage") + guides(size=FALSE)
 
-setwd("M:/users/matheus/mongo/crawler/results_2014_05_24-M3-R1")
-performance = read.csv("performance.csv", header = TRUE, stringsAsFactors = FALSE)
+setwd("C:/Users/Matheus/VMS/mongo/crawler/results_2014_05_24-M3-R1")
+performance = read.csv("performance_all.csv", header = TRUE, stringsAsFactors = FALSE)
 str(performance)
 performance$configuration <- mapply(function(x,y){paste(x,y,sep="_")}, performance$instances, performance$provider_id)
 performance$vm_type <- factor(performance$vm_type, order=TRUE)
-performance$provider_id <- factor(performance$provider_id, order=TRUE)
+performance$provider_id <- factor(performance$provider_id, levels = c("m3_m", "c3_l", "m3_l","c3_xl", "m3_xl", "c3_2xl", "m3_2xl"))
 performance$workload <- factor(performance$workload, order=TRUE)
 performance$cpubusy <- as.numeric(performance$cpubusy)
-performance$cpubusy_fac <- cut(performance$cpubusy, breaks=4)
+performance$cpubusy_fac <- cut(performance$cpubusy, breaks=5)
 performance$instances <- factor(performance$instances, order=TRUE)
 str(performance)
 library(ggplot2)
 ggplot(subset(performance, vm_type != "nginx"), aes(provider_id, fill=cpubusy_fac)) + facet_grid(instances  ~  workload * vm_type )+ geom_bar(position="fill") + coord_flip() + ggtitle("CPU Usage") + guides(size=FALSE)
+ggplot(subset(performance, vm_type != "nginx"), aes(provider_id, fill=cpubusy_fac)) + facet_grid(instances  ~  workload * vm_type )+ geom_bar(position="fill") + coord_flip() + ggtitle("CPU Usage") + guides(size=FALSE) + scale_fill_manual(values = c("#3366CC","#109618","#990099","#FF9900","#DC3912"))
+
+
+results = read.csv("results.csv", header = TRUE, stringsAsFactors = FALSE)
+str(results)
+results$provider_id <- factor(results$provider_id, order=TRUE)
+results$workload <- factor(results$workload, order=TRUE)
+results$instances <- factor(results$instances, order=TRUE)
+str(results)
+results$response_time_fac <- cut(results$response_time, breaks=10)
+ggplot(results, aes(provider_id, fill=response_time_fac)) + facet_grid(instances  ~  workload )+ geom_bar(position="fill") + coord_flip() + ggtitle("Response Time") + guides(size=FALSE)
+ggplot(results, aes(response_time, provider_id)) + facet_grid(instances  ~  workload )+ geom_point(position = "jitter")
+
+
+
+results = read.csv("results_all.csv", header = TRUE, stringsAsFactors = FALSE)
+results$configuration <- results$provider_id
+results$instances <- sapply(results$provider_id, function(x) {
+  unlist(strsplit(x,"_"))[1]
+})
+results$provider_id <- sapply(results$provider_id, function(x) {
+  provider <- unlist(strsplit(x,"_"))
+  paste(provider[2],provider[3],sep="_")
+})
+results$provider_id <- factor(results$provider_id, levels = c("m3_m", "c3_l", "m3_l","c3_xl", "m3_xl", "c3_2xl", "m3_2xl"))
+results$workload <- factor(results$workload, order=TRUE)
+str(results)
+results$response_time_fac <- cut(results$response_time, breaks=5)
+ggplot(results, aes(provider_id, response_time)) + facet_grid(instances  ~  workload )+ geom_jitter() + coord_flip() + ggtitle("Response Time") + guides(size=FALSE)
+
+
+png(file="response_time_below_500.png", units="in", width=11, height=8.5, res=300)
+ggplot(subset(results, workload <= 500), aes(provider_id, response_time)) + facet_grid(instances  ~  workload )+ geom_jitter() + coord_flip() + ggtitle("Response Time") + guides(size=FALSE)
+dev.off()
+png(file="response_time_above_500.png", units="in", width=11, height=8.5, res=300)
+ggplot(subset(results, workload > 500), aes(provider_id, response_time)) + facet_grid(instances  ~  workload )+ geom_jitter() + coord_flip() + ggtitle("Response Time") + guides(size=FALSE)
+dev.off()
+png(file="cpu_usage_below_500.png", units="in", width=11, height=8.5, res=300)
+ggplot(subset(performance, vm_type != "nginx" & workload <= 500), aes(provider_id, fill=cpubusy_fac)) + facet_grid(instances  ~  workload * vm_type )+ geom_bar(position="fill") + coord_flip() + ggtitle("CPU Usage") + guides(size=FALSE) + scale_fill_manual(values = c("#3366CC","#109618","#990099","#FF9900","#DC3912"))
+dev.off()
+png(file="cpu_usage_above_500.png", units="in", width=11, height=8.5, res=300)
+ggplot(subset(performance, vm_type != "nginx" & workload > 500), aes(provider_id, fill=cpubusy_fac)) + facet_grid(instances  ~  workload * vm_type )+ geom_bar(position="fill") + coord_flip() + ggtitle("CPU Usage") + guides(size=FALSE) + scale_fill_manual(values = c("#3366CC","#109618","#990099","#FF9900","#DC3912"))
+dev.off()

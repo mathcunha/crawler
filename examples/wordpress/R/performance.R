@@ -1,5 +1,5 @@
 setwd("C:/Users/Matheus/VMS/mongo/crawler/results_2014_05_24-M3-R1")
-performance = read.csv("performance.csv", header = TRUE)
+performance = read.csv("performance.csv", header = TRUE, stringsAsFactors = FALSE)
 str(performance)
 performance$workload <- factor(performance$workload, order=TRUE)
 library(ggplot2)
