@@ -7,7 +7,7 @@ Capacity Planning for Cloud Applications
 ## Description
 
 <p align="center">
-  <img src="https://sites.google.com/site/nabormendonca/_/rsrc/1387726329838/research-projects/cloud-crawler/cloud-crawler-overview.png?height=197&width=400&height=198" alt="Cloud Crawler overview"/>
+  <img src="https://dl.dropboxusercontent.com/u/8824869/cloudcrawler-overview-eng4.png?height=197&width=400&height=198" alt="Cloud Crawler overview"/>
 </p>
 
 This project aims at proposing a new declarative environment, called Cloud Crawler, to support cloud users (i.e., application developers) in automatically evaluating the performance of their cloud applications under varying demand levels and using different virtual machine configurations from multiple IaaS cloud providers. The environment includes a domain-specific language, called Crawl, which allows the description, at a high abstraction level, of a variety of performance evaluation scenarios in the cloud; and an extensible execution engine, called Crawler, which automatically configures the resources, executes and collects the results of the evaluation scenarios described in Crawl.
