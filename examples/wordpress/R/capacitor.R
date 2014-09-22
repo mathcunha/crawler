@@ -1,4 +1,4 @@
-setwd("M:/users/matheus/crawler/repos/crawler/examples/wordpress/R")
+setwd("C:/Users/Matheus/VMS/crawler/repos/crawler/examples/wordpress/R")
 capacitor = read.csv("capacitor.csv", header = TRUE, stringsAsFactors = FALSE)
 str(capacitor)
 oracle = read.csv("summarized_price.csv", header = TRUE, stringsAsFactors = FALSE)
@@ -104,13 +104,26 @@ ggplot(roc, aes(x = FPR, y = TPR)) +
     axis.title.y  = element_text(face="bold")
     )
 
+ggplot(roc, aes(x = PPV, y = TPR)) +  
+  geom_point(size=3, colour="black") +
+  facet_grid(. ~ workload) +
+  geom_text (aes(label = heuristic, angle = 0, hjust=0.5, vjust=-0.5), size = 3.5) +
+  scale_x_continuous("Precision",limits=c(0, 1)) +
+  scale_y_continuous("Recal",limits=c(0, 1)) +
+  theme_bw(base_size = 12, base_family = "") +
+  theme(
+    axis.title.x  = element_text(face="bold"),
+    axis.title.y  = element_text(face="bold")
+  )
+
 
 roc = read.csv("cap_result.csv", header = TRUE, stringsAsFactors = FALSE)
 roc$workload <- factor(roc$workload, order=TRUE)
 
 ggplot(roc, aes(x = workload, y = F_MEASURE)) +
-  geom_point(size=3, colour="black") +
-  geom_text (aes(label = heuristic, angle = 0, hjust=0, vjust=-0.5), size = 3.5) +  
+  geom_point(size=3, aes(colour=heuristic)) +  
+  geom_line(aes(group=heuristic, colour=heuristic), linetype="dashed") +
+  geom_text (aes(label = heuristic, angle = 0, hjust=0.5, vjust=-0.5), size = 3.5) +  
   scale_x_discrete("Workload") +
   scale_y_continuous("F-Measure",limits=c(0, 1)) +
   ggtitle("SLA <= 10000") +
