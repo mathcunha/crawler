@@ -21,6 +21,7 @@ valores2$passed[valores2$percentile > 30000 & valores2$percentile <= 40000] <- "
 valores2$passed[valores2$percentile > 40000] <- "PERDEU-PRE"
 
 newdata <- valores2[order(valores2$instances, decreasing = TRUE), ]
+ggplot(newdata, aes(x=workload, y=provider_id)) + geom_point(colour="black", aes(size=instances, position=instances, fill=passed), shape=21) + scale_size_manual(values=c(5,10, 15,20))  + scale_fill_manual(values = c("#93f298", "#f2bcb5"))
 
 newdata$instances_plus[newdata$instances == 1] <- 6
 newdata$instances_plus[newdata$instances == 2] <- 11
