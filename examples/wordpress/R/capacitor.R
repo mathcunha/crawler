@@ -104,12 +104,12 @@ ggplot(roc, aes(x = FPR, y = TPR)) +
     axis.title.y  = element_text(face="bold")
     )
 
-ggplot(roc, aes(x = PPV, y = TPR)) +  
+ggplot(roc, aes(x = TPR, y = PPV)) +  
   geom_point(size=3, colour="black") +
   facet_grid(. ~ workload) +
   geom_text (aes(label = heuristic, angle = 0, hjust=0.5, vjust=-0.5), size = 3.5) +
-  scale_x_continuous("Precision",limits=c(0, 1)) +
-  scale_y_continuous("Recal",limits=c(0, 1)) +
+  scale_y_continuous("Precision",limits=c(0, 1)) +
+  scale_x_continuous("Recal",limits=c(0, 1)) +
   theme_bw(base_size = 12, base_family = "") +
   theme(
     axis.title.x  = element_text(face="bold"),
