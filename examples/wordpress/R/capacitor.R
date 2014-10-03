@@ -119,6 +119,7 @@ capacitor_summary <- function(data){
   }
   result$PREDICT <- sum(data$predict_num)
   result$EXEC <- nrow(data) - result$PREDICT
+  result$PRICE <- sum(data$price)
   return(result)
 }
 
@@ -141,6 +142,7 @@ calc_performance <- function(file, pSla){
   oracle$metsla[oracle$percentile <= pSla] <- T
   oracle$metsla[oracle$percentile > pSla] <- F
   capacitor$oracle <- oracle$metsla
+  capacitor$price <- oracle$total_price  
   
   capacitor$metsla_num[capacitor$metsla] <- 1
   capacitor$metsla_num[!capacitor$metsla] <- 0
@@ -153,6 +155,7 @@ calc_performance <- function(file, pSla){
   capacitor$predict_num[capacitor$predict] <- 1
   capacitor$predict_num[!capacitor$predict] <- 0
   capacitor$predict_num[is.na(capacitor$predict)] <- 0
+  capacitor$price[capacitor$predict_num == 1] <- 0
   
   capacitor <- subset(capacitor, !is.na(metsla))
   
@@ -176,7 +179,8 @@ calc_performance <- function(file, pSla){
 # sed -i 's;true;TRUE;g' *.csv
 # sed -i 's;false;FALSE;g' *.csv
 
-files <- c("CC_heuristic_result.csv","CO_heuristic_result.csv","CP_heuristic_result.csv","CR_heuristic_result.csv","OC_heuristic_result.csv","OO_heuristic_result.csv","OP_heuristic_result.csv","OR_heuristic_result.csv","PC_heuristic_result.csv","PO_heuristic_result.csv","PP_heuristic_result.csv","PR_heuristic_result.csv","RC_heuristic_result.csv","RO_heuristic_result.csv","RP_heuristic_result.csv","RR_heuristic_result.csv")
+#files <- c("CC_heuristic_result.csv","CO_heuristic_result.csv","CP_heuristic_result.csv","CR_heuristic_result.csv","OC_heuristic_result.csv","OO_heuristic_result.csv","OP_heuristic_result.csv","OR_heuristic_result.csv","PC_heuristic_result.csv","PO_heuristic_result.csv","PP_heuristic_result.csv","PR_heuristic_result.csv","RC_heuristic_result.csv","RO_heuristic_result.csv","RP_heuristic_result.csv","RR_heuristic_result.csv")
+files <- c("CC_heuristic_price_mode_result.csv","CO_heuristic_price_mode_result.csv","CP_heuristic_price_mode_result.csv","CR_heuristic_price_mode_result.csv","OC_heuristic_price_mode_result.csv","OO_heuristic_price_mode_result.csv","OP_heuristic_price_mode_result.csv","OR_heuristic_price_mode_result.csv","PC_heuristic_price_mode_result.csv","PO_heuristic_price_mode_result.csv","PP_heuristic_price_mode_result.csv","PR_heuristic_price_mode_result.csv","RC_heuristic_price_mode_result.csv","RO_heuristic_price_mode_result.csv","RP_heuristic_price_mode_result.csv","RR_heuristic_price_mode_result.csv")
 slas <- seq(10000, 100000, by=10000)
 results <- c()
 
@@ -191,3 +195,11 @@ write.table(results, "cap_result.csv", sep=",")
 subset(results, sla==30000 & heuristic=="CO")
 
 results <- rbind(results, calc_performance("RO_heuristic_result.csv", 10000))
+require(doBy)
+roc = read.csv("cap_result.csv", header = TRUE, stringsAsFactors = FALSE)
+precision <- summaryBy(roc$PPV ~ roc$heuristic + roc$sla , roc, FUN = c(mean))
+recall <- summaryBy(roc$TPR ~ roc$heuristic +  roc$sla , roc, FUN = c(mean))
+f_measure <- summaryBy(roc$F_MEASURE ~ roc$heuristic +  roc$sla, roc, FUN = c(mean))
+valores_merged <- merge(precision, recall, by = c("heuristic","sla"))
+valores_merged <- merge(valores_merged, f_measure, by = c("heuristic","sla"))
+write.table(valores_merged, "summarized_sla_workload.csv", sep=",")
