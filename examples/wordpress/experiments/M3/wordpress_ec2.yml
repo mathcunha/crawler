@@ -82,11 +82,16 @@ virtualMachines:
 
 scenarios:
   !foreach
+  list: 1,2,3,4
+  var: number
+  statement:
+  #NEW SCENARIO
+  !foreach
   list: c3_large,c3_xlarge,c3_2xlarge
   var: profile
   statement:
   - !scenario
-    name: 4_$[profile]
+    name: $[number]_$[profile]
     id: 1
     endable: false
     workload: !workload
@@ -99,10 +104,10 @@ scenarios:
       nginx : *nginx
       mysql : *mysql
       !foreach
-      list: 1,2,3,4
-      var: number
+      until: $[number]
+      var: size
       statement:
-      wordpress$[number] : &wordpress !virtualMachine
+      wordpress$[size] : &wordpress !virtualMachine
         id: 5
         image: ami-c658bcae
         type: *$[profile]
