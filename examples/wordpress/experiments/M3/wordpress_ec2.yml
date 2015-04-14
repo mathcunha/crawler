@@ -1,0 +1,122 @@
+!benchmark
+id: 1
+name: SimplePost
+rounds: 1
+endable: true
+
+!include
+file: providers.yml
+
+properties:
+   chef_script_wordpress : 
+    &chef_script_wordpress !scriptlet
+     scripts:
+      - "knife ec2 server create --availability-zone us-east-1a --node-name ${name} --flavor ${type.providerProfile} --image ${image} --run-list \"role[wordpress-role]\" --ssh-user ${type.provider.userName} --ssh-key chef  --identity-file chef.pem  -c knife.rb"
+   test_parser : 
+    &test_parser !scriptlet
+     scripts:
+      - "echo '${scenarioScope.metric(wordpress).privateIpAddress}'>> /tmp/testip"
+   start_apache :
+    &start_apache !scriptlet
+     scripts :
+      - "sudo sed -i 's;^       StartServers.*;       StartServers       ${type.properties(StartServers)};g' /etc/apache2/mods-available/mpm_prefork.conf"
+      - "sudo sed -i 's;^       ServerLimit.*;       ServerLimit       ${type.properties(ServerLimit)};g' /etc/apache2/mods-available/mpm_prefork.conf"
+      - "sudo sed -i 's;^       MaxRequestWorkers.*;       MaxRequestWorkers       ${type.properties(ServerLimit)};g' /etc/apache2/mods-available/mpm_prefork.conf"
+      - "~/change_database.sh ${scenarioScope.metric(mysql).privateIpAddress}"
+      - "~/configHost.sh ${scenarioScope.metric(nginx).privateIpAddress}"
+      - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.properties(crawler).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+  
+virtualMachines:
+ - &gatling !virtualMachine
+   id: 1
+   providerId: us-east-1/i-0f577d5c
+   type: *m3_xlarge
+   name: gatling
+   scripts:    
+    submit_workload : !scriptlet
+      scripts:
+       - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.properties(crawler).privateIpAddress};g" /home/ubuntu/logstash_metrics/metric_colector_application.conf'
+       - "~/execution.sh ${scenarioScope.metric(nginx).privateIpAddress} ${scenarioScope.name}"
+ - &crawler !virtualMachine
+   id: 2
+   providerId: us-east-1/i-f9abd6d7
+   type: *c3_large
+   name: crawler
+   scripts:
+    start_metric : *test_parser
+ - &mysql !virtualMachine
+   id: 3
+   providerId: us-east-1/i-0dfb042c
+   type: *m3_2xlarge
+   name: mysql
+   scripts:
+    start_metric : 
+      !scriptlet
+         scripts:
+          - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.properties(crawler).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+          - "~/clear_db.sh"
+          - "~/configMetric.sh ${scenarioScope.name}"
+          - "sudo service mysql restart"
+    stop_metric : 
+      !scriptlet
+         scripts:
+           - "sudo service logstash-indexer stop"
+ - &nginx !virtualMachine
+   id: 4
+   providerId: us-east-1/i-3cf6091d
+   type: *c3_large
+   name: nginx
+   scripts:
+   scripts:
+    start_metric : 
+      !scriptlet
+         scripts:
+          - 'sed -i "s;\(host => \"[^\"]*\);host => \"${scenarioScope.properties(crawler).privateIpAddress};g" /home/ubuntu/logstash_metrics/indexer.conf'
+          - "~/configNginx.sh 1 ${scenarioScope.metric(wordpress).privateIpAddress}"
+          - "sudo service nginx restart"
+          - "~/configMetric.sh ${scenarioScope.name}"
+    stop_metric : 
+      !scriptlet
+         scripts:
+           - "sudo service logstash-indexer stop"
+
+scenarios:
+  !foreach
+  list: c3_large,c3_xlarge,c3_2xlarge
+  var: profile
+  statement:
+  - !scenario
+    name: 4_$[profile]
+    id: 1
+    endable: false
+    workload: !workload
+     targets:
+      - *gatling
+     functions:
+      - !workloadFunction
+       values: "100,200,300,400,500,600,700,800,900,1000"
+    metric:
+      nginx : *nginx
+      mysql : *mysql
+      !foreach
+      list: 1,2,3,4
+      var: number
+      statement:
+      wordpress$[number] : &wordpress !virtualMachine
+        id: 5
+        image: ami-c658bcae
+        type: *$[profile]
+        name: wordpress        
+        scripts:
+          start_vm : *start_apache
+          start_metric : 
+            !scriptlet
+              scripts:
+               - "~/configMetric.sh ${scenarioScope.name}"
+               - "sudo service apache2 restart"
+          stop_metric : 
+            !scriptlet
+              scripts:
+                - "sudo service logstash-indexer stop"
+    properties:
+      crawler : *crawler
