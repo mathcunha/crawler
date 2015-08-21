@@ -9,6 +9,30 @@ virtualMachineTypes:
  - &m1_small !virtualMachineType
     providerProfile: m1.small
     provider: *ec2
+ - &t1_micro !virtualMachineType
+    providerProfile: t1.micro
+    provider: *ec2
+ - &c1_medium !virtualMachineType
+    providerProfile: c1.medium
+    provider: *ec2
+ - &m1_large !virtualMachineType
+    providerProfile: m1.large
+    provider: *ec2
+ - &m2_xlarge !virtualMachineType
+    providerProfile: m2.xlarge
+    provider: *ec2
+ - &c1_xlarge !virtualMachineType
+    providerProfile: c1.xlarge
+    provider: *ec2
+ - &m1_xlarge !virtualMachineType
+    providerProfile: m1.xlarge
+    provider: *ec2
+ - &m2_2xlarge !virtualMachineType
+    providerProfile: m2.2xlarge
+    provider: *ec2
+ - &m2_4xlarge !virtualMachineType
+    providerProfile: m2.4xlarge
+    provider: *ec2
  - &c3_large !virtualMachineType
     providerProfile: c3.large
     provider: *ec2
