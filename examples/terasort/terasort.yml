@@ -1,0 +1,57 @@
+!benchmark
+id: 0
+name: TeraSort
+rounds: 1
+endable: false
+
+providers:
+ - &ec2 !provider
+    name: aws-ec2
+    credentialPath: AwsCredentials.properties
+
+#tipos de instancia oferecidas pelo provedores de nuvem
+virtualMachineTypes:    
+ - &m3_medium !virtualMachineType
+    providerProfile: m3.medium
+    provider: *ec2
+  
+virtualMachines:
+ - &master !virtualMachine
+   id: 1
+   providerId: us-east-1/i-81bd3b54
+   type: *m3_medium
+   name: master
+   scripts:
+    start_metric : &confighosts !scriptlet
+      scripts:
+       - 'sudo -s sed -i "s;^.* hadoopmaster;${scenarioScope.metric(master).privateIpAddress} hadoopmaster;g" /etc/hosts'
+       - 'sudo -s sed -i "s;^.* hadoopslave01;${scenarioScope.metric(slave).privateIpAddress} hadoopslave01;g" /etc/hosts'
+    stop_metric : &nada !scriptlet
+      scripts:
+       - ' '
+    submit_workload : !scriptlet
+     scripts:
+       - '~/start.sh'
+ - &slave !virtualMachine
+   id: 2
+   providerId: us-east-1/i-09da5bdc
+   type: *m3_medium
+   name: slave
+   scripts:
+    start_metric : *confighosts
+    stop_metric : *nada
+
+scenarios:
+  - !scenario
+    name: 1_m3_medium
+    id: 1
+    endable: false
+    workload: !workload
+     targets:
+      - *master
+     functions:
+      - !workloadFunction
+       values: "1000000"
+    metric:
+      slave : *slave
+      master : *master
