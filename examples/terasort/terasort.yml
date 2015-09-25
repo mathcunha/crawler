@@ -1,5 +1,5 @@
 !benchmark
-id: 8
+id: 2
 name: TeraSort
 rounds: 1
 endable: false
@@ -14,14 +14,17 @@ virtualMachineTypes:
  - &m3_medium !virtualMachineType
     providerProfile: m3.medium
     provider: *ec2
+ - &m3_xlarge !virtualMachineType
+    providerProfile: m3.xlarge
+    provider: *ec2
 
 scriptlets:
  - &confighosts !scriptlet
    id: 1
    scripts:
-    - 'sudo -s sed -i "s;^.* hadoopmaster;${scenarioScope.metric(master).privateIpAddress} hadoopmaster;g" /etc/hosts'
+    - 'sudo -s sed -i "s;^.* hadoopmaster;${scenarioScope.properties(master).privateIpAddress} hadoopmaster;g" /etc/hosts'
     - 'sudo -s sed -i "s;^.* hadoopslave01;${scenarioScope.metric(slave).privateIpAddress} hadoopslave01;g" /etc/hosts'
-    - '~/start_metric.sh 10.142.201.15'
+    - 'source ~/.profile; export ELASTIC_PORT=http://${scenarioScope.properties(crawler).privateIpAddress}:9200 nohup go run /home/ubuntu/go/src/github.com/mathcunha/go-probe/examples/hadoop.go -jvmmetrics /usr/local/hadoop-metrics/nodemanager-jvm-metrics.out > & /dev/null '
  - &stop_metric !scriptlet
    id: 2
    scripts:
@@ -30,30 +33,49 @@ scriptlets:
  - &submit !scriptlet
    id: 3
    scripts:
-    - '~/start.sh'
- - &start_crawler !scriptlet
+    - 'sudo -u hduser /home/hduser/execute.sh ${scenarioScope.name}'
+ - &start_master !scriptlet
    id: 4
    scripts:
-    - 'sudo nohup docker-compose -f /home/ubuntu/go/src/github.com/mathcunha/gomonitor/docker-compose.yml start &'
+    - 'sudo -s sed -i "s;^.* hadoopmaster;${privateIpAddress} hadoopmaster;g" /etc/hosts'
+    - 'sudo -s sed -i "s;^.* hadoopslave01;${properties(slave).privateIpAddress} hadoopslave01;g" /etc/hosts'
+    - 'sudo -u hduser /usr/local/hadoop/sbin/start-dfs.sh'
+    - 'sudo -u hduser /usr/local/hadoop/sbin/start-yarn.sh'
+ - &start_crawler !scriptlet
+   id: 5
+   scripts:
+    - 'sudo docker-compose -f /home/ubuntu/go/src/github.com/mathcunha/gomonitor/docker-compose.yml start'
+ - &nada !scriptlet
+   id: 6
+   scripts:
+    - '~/nada.sh'
 
 virtualMachines:
- - &master !virtualMachine
-   id: 2
-   providerId: us-east-1/i-81bd3b54
-   type: *m3_medium
-   name: master
+ - &crawler !virtualMachine
+   id: 1
+   providerId: us-east-1/i-99acf94c
+   type: *m3_xlarge
+   name: crawler
    scripts:
-    start_metric : *confighosts
-    stop_metric: *stop_metric
-    submit_workload : *submit
+    start_vm : *start_crawler
  - &slave !virtualMachine
-   id: 3
+   id: 2
    providerId: us-east-1/i-09da5bdc
    type: *m3_medium
    name: slave
    scripts:
     start_metric : *confighosts
     stop_metric : *stop_metric
+ - &master !virtualMachine
+   id: 3
+   providerId: us-east-1/i-81bd3b54
+   type: *m3_medium
+   name: master
+   scripts:
+    start_vm : *start_master
+    submit_workload : *submit
+   properties:
+    slave: *slave
 
 workloads:
  - &terasort !workload
@@ -71,4 +93,6 @@ scenarios:
     workload: *terasort
     metric:
       slave : *slave
+    properties:
       master : *master
+      crawler : *crawler
