@@ -1,5 +1,5 @@
 !benchmark
-id: 2
+id: 1
 name: TeraSort
 rounds: 1
 endable: false
@@ -24,7 +24,8 @@ scriptlets:
    scripts:
     - 'sudo -s sed -i "s;^.* hadoopmaster;${scenarioScope.properties(master).privateIpAddress} hadoopmaster;g" /etc/hosts'
     - 'sudo -s sed -i "s;^.* hadoopslave01;${scenarioScope.metric(slave).privateIpAddress} hadoopslave01;g" /etc/hosts'
-    - 'source ~/.profile; export ELASTIC_PORT=http://${scenarioScope.properties(crawler).privateIpAddress}:9200 nohup go run /home/ubuntu/go/src/github.com/mathcunha/go-probe/examples/hadoop.go -jvmmetrics /usr/local/hadoop-metrics/nodemanager-jvm-metrics.out > & /dev/null '
+    - '~/start_metric.sh ${scenarioScope.properties(crawler).privateIpAddress} ${scenarioScope.name}'
+#   - 'source ~/.profile; export ELASTIC_PORT=http://${scenarioScope.properties(crawler).privateIpAddress}:9200; nohup go run /home/ubuntu/go/src/github.com/mathcunha/go-probe/examples/hadoop.go -jvmmetrics /usr/local/hadoop-metrics/nodemanager-jvm-metrics.out </dev/null &>/dev/null &'
  - &stop_metric !scriptlet
    id: 2
    scripts:
@@ -83,11 +84,11 @@ workloads:
    - *master
   functions:
    - !workloadFunction
-    values: "1000000"
+    values: "3000000"
 
 scenarios:
   - !scenario
-    name: 1_m3_medium
+    name: 1_M3_medium
     id: 1
     endable: false
     workload: *terasort
