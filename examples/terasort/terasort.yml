@@ -1,5 +1,5 @@
 !benchmark
-id: 2
+id: 1
 name: TeraSort
 rounds: 1
 endable: false
@@ -29,6 +29,7 @@ scriptlets:
    id: 1
    scripts:
     - 'sudo -s sed -i "s;^.* hadoopmaster;${scenarioScope.metric(master).privateIpAddress} hadoopmaster;g" /etc/hosts'
+    - 'sudo -s ~/config_slaves.sh ${scenarioScope.metric(slave).privateIpAddress}; echo'
     - '~/start_metric.sh ${scenarioScope.properties(crawler).privateIpAddress} ${scenarioScope.name}'
 #   - 'source ~/.profile; export ELASTIC_PORT=http://${scenarioScope.properties(crawler).privateIpAddress}:9200; nohup go run /home/ubuntu/go/src/github.com/mathcunha/go-probe/examples/hadoop.go -jvmmetrics /usr/local/hadoop-metrics/nodemanager-jvm-metrics.out </dev/null &>/dev/null &'
  - &stop_metric !scriptlet
@@ -36,6 +37,7 @@ scriptlets:
    scripts:
     - "ps -aux | grep go | grep hadoop | awk '{print $2}' | xargs kill -9"
     - "ps -aux | grep tail | awk '{print $2}' | xargs kill -9"
+    - 'sudo -u hduser rm -rf /usr/local/hadoop_tmp/*'
  - &submit !scriptlet
    id: 3
    scripts:
@@ -43,7 +45,6 @@ scriptlets:
  - &start_slave !scriptlet
    id: 4
    scripts:
-    - 'sudo -s sed -i "s;^.* hadoopslave01;${privateIpAddress} hadoopslave01;g" /etc/hosts'
     - 'cd ~/go/src/github.com/mathcunha/go-probe; git pull --rebase'
  - &start_master !scriptlet
    id: 5
@@ -56,7 +57,7 @@ scriptlets:
  - &config_master !scriptlet
    id: 7
    scripts:
-     - 'sudo -s sed -i "s;^.* hadoopslave01;${scenarioScope.metric(slave).privateIpAddress} hadoopslave01;g" /etc/hosts'
+     - 'sudo -s ~/config_slaves.sh ${scenarioScope.metric(slave).privateIpAddress}; echo'
      - 'sudo -u hduser /usr/local/hadoop/sbin/start-dfs.sh;echo'
      - 'sudo -u hduser /usr/local/hadoop/sbin/start-yarn.sh;echo'
  - &stop_metric_master !scriptlet
@@ -64,6 +65,8 @@ scriptlets:
    scripts:
      - 'sudo -u hduser /usr/local/hadoop/sbin/stop-yarn.sh'
      - 'sudo -u hduser /usr/local/hadoop/sbin/stop-dfs.sh'
+     - 'sudo -u hduser rm -rf /usr/local/hadoop_tmp/*'
+     - 'sudo -u hduser /usr/local/hadoop/bin/hdfs namenode -format'
 
 virtualMachines:
  - &crawler !virtualMachine
