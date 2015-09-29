@@ -1,0 +1,25 @@
+!scenario
+    name: 1_m3_medium
+    id: 1
+    endable: false
+    workload: !workload
+     targets:
+      - *master
+     functions:
+      - !workloadFunction
+       values: "10000000,20000000,30000000,40000000,50000000"
+    metric:
+      slave : &slave !virtualMachine
+       id: 2
+       providerId: us-east-1/i-09da5bdc
+       type: !virtualMachineType
+        providerProfile: m3.medium
+        provider: *ec2
+       name: slave
+       scripts:
+        start_vm: *start_slave
+        start_metric : *config_slave
+        stop_metric : *stop_metric
+      master : *master
+    properties:
+      crawler : *crawler
