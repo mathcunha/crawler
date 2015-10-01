@@ -1,0 +1,130 @@
+!benchmark
+id: 2
+name: TeraSort
+rounds: 1
+endable: false
+
+providers:
+ - &ec2 !provider
+    name: aws-ec2
+    credentialPath: AwsCredentials.properties
+
+#tipos de instancia oferecidas pelo provedores de nuvem
+virtualMachineTypes:    
+ - &m3_medium !virtualMachineType
+    providerProfile: m3.medium
+    provider: *ec2
+ - &m3_large !virtualMachineType
+    providerProfile: m3.large
+    provider: *ec2
+ - &m3_xlarge !virtualMachineType
+    providerProfile: m3.xlarge
+    provider: *ec2
+ - &m3_2xlarge !virtualMachineType
+    providerProfile: m3.2xlarge
+    provider: *ec2
+
+scriptlets:
+ - &config_slave !scriptlet
+   id: 1
+   scripts:
+    - 'sudo -s sed -i "s;^.* hadoopmaster;${scenarioScope.metric(master).privateIpAddress} hadoopmaster;g" /etc/hosts'
+    - 'sudo -s ~/config_slaves.sh ${scenarioScope.metric(slave).privateIpAddress} ${scenarioScope.metric(slave2).privateIpAddress}; echo'
+    - '~/start_metric.sh ${scenarioScope.properties(crawler).privateIpAddress} ${scenarioScope.name}'
+#   - 'source ~/.profile; export ELASTIC_PORT=http://${scenarioScope.properties(crawler).privateIpAddress}:9200; nohup go run /home/ubuntu/go/src/github.com/mathcunha/go-probe/examples/hadoop.go -jvmmetrics /usr/local/hadoop-metrics/nodemanager-jvm-metrics.out </dev/null &>/dev/null &'
+ - &stop_metric !scriptlet
+   id: 2
+   scripts:
+    - "ps -aux | grep go | grep hadoop | awk '{print $2}' | xargs kill -9"
+    - "ps -aux | grep tail | awk '{print $2}' | xargs kill -9"
+    - 'sudo -u hduser rm -rf /usr/local/hadoop_tmp/*'
+ - &submit !scriptlet
+   id: 3
+   scripts:
+    - 'sudo -u hduser /home/hduser/execute.sh ${scenarioScope.name}'
+ - &start_slave !scriptlet
+   id: 4
+   scripts:
+    - 'cd ~/go/src/github.com/mathcunha/go-probe; git pull --rebase'
+    - 'sudo -u hduser rm -rf /usr/local/hadoop_tmp/*'
+ - &start_master !scriptlet
+   id: 5
+   scripts:
+    - 'sudo -s sed -i "s;^.* hadoopmaster;${privateIpAddress} hadoopmaster;g" /etc/hosts'
+ - &start_crawler !scriptlet
+   id: 6
+   scripts:
+    - 'sudo docker-compose -f /home/ubuntu/go/src/github.com/mathcunha/gomonitor/docker-compose.yml start'
+ - &config_master !scriptlet
+   id: 7
+   scripts:
+     - 'sudo -s ~/config_slaves.sh ${scenarioScope.metric(slave).privateIpAddress} ${scenarioScope.metric(slave2).privateIpAddress}; echo'
+     - 'sudo -u hduser /usr/local/hadoop/sbin/start-dfs.sh;echo'
+     - 'sudo -u hduser /usr/local/hadoop/sbin/start-yarn.sh;echo'
+ - &stop_metric_master !scriptlet
+   id: 8
+   scripts:
+     - 'sudo -u hduser /usr/local/hadoop/sbin/stop-yarn.sh'
+     - 'sudo -u hduser /usr/local/hadoop/sbin/stop-dfs.sh'
+     - 'sudo -u hduser rm -rf /usr/local/hadoop_tmp/*'
+     - 'sudo -u hduser /usr/local/hadoop/bin/hdfs namenode -format'
+
+virtualMachines:
+ - &crawler !virtualMachine
+   id: 1
+   providerId: us-east-1/i-99acf94c
+   type: *m3_xlarge
+   name: crawler
+   scripts:
+    start_vm : *start_crawler
+ - &master !virtualMachine
+   id: 3
+   providerId: us-east-1/i-81bd3b54
+   type: *m3_medium
+   name: master
+   scripts:
+    start_vm: *start_master
+    start_metric : *config_master
+    stop_metric : *stop_metric_master
+    submit_workload : *submit
+
+workloads:
+ - &terasort !workload
+  targets:
+   - *master
+  functions:
+   - !workloadFunction
+    values: "10000000,20000000,30000000,40000000,50000000"
+
+scenarios:
+ !foreach
+  list: m3_medium,m3_large,m3_xlarge,m3_2xlarge
+  var: profile
+  statement:
+  - !scenario
+    name: 2_$[profile]
+    id: $[count]
+    endable: false
+    workload: *terasort
+    metric:
+      slave : &slave !virtualMachine
+       id: 2
+       providerId: us-east-1/i-09da5bdc
+       type: *$[profile]
+       name: slave
+       scripts:
+        start_vm: *start_slave
+        start_metric : *config_slave
+        stop_metric : *stop_metric
+      slave2 : &slave !virtualMachine
+       id: 4
+       providerId: us-east-1/i-3fbdbcea
+       type: *$[profile]
+       name: slave
+       scripts:
+        start_vm: *start_slave
+        start_metric : *config_slave
+        stop_metric : *stop_metric
+      master : *master
+    properties:
+      crawler : *crawler
