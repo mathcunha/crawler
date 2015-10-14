@@ -23,6 +23,15 @@ virtualMachineTypes:
  - &m3_2xlarge !virtualMachineType
     providerProfile: m3.2xlarge
     provider: *ec2
+ - &c3_large !virtualMachineType
+    providerProfile: c3.large
+    provider: *ec2
+ - &c3_xlarge !virtualMachineType
+    providerProfile: c3.xlarge
+    provider: *ec2
+ - &c3_2xlarge !virtualMachineType
+    providerProfile: c3.2xlarge
+    provider: *ec2
 
 scriptlets:
  - &config_slave !scriptlet
@@ -98,7 +107,7 @@ workloads:
 
 scenarios:
  !foreach
-  list: m3_medium,m3_large,m3_xlarge,m3_2xlarge
+  list: m3_medium,m3_large,m3_xlarge,m3_2xlarge,c3_large,c3_xlarge,c3_2xlarge
   var: profile
   statement:
   - !scenario

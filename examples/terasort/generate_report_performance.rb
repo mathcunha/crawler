@@ -5,7 +5,9 @@ require 'logger'
 require 'date'
 
 class GenerateReport
-  def initialize(server_ip:'127.0.0.1', server_port:9200)
+  def initialize(server_ip:'23.22.243.1', server_port:9200)
+	  @server_ip=server_ip
+	  @server_port=server_port
      @result = Hash.new
 	 path = File.expand_path('../', __FILE__)
 	 file = File.join( path, "results.csv" )
@@ -19,6 +21,7 @@ class GenerateReport
 	 
   end
   def run
+	puts "scenario,workload,memused,cpuused"
 	@result.each  do |key, value| 		
 		ini = DateTime.strptime(value[:ini], "%Q")
 		fim = DateTime.strptime(value[:fim], "%Q")
@@ -41,7 +44,7 @@ class GenerateReport
   end
   def load_results(results)
     results["hits"]["hits"].each do |result|
-		puts "\"#{result["_source"]["Scenario"]}\",#{result["_source"]["Workload"]}"
+		puts "\"#{result["_source"]["Scenario"]}\",#{result["_source"]["Workload"]},#{result["_source"]["MemFree"]*1.0/result["_source"]["MemTotal"]},#{100.0-result["_source"]["CPU"]["Idle"]}"
 	end
   end
   def get_results(body)
