@@ -1,5 +1,5 @@
 !benchmark
-id: 10
+id: 1
 name: mongodb
 rounds: 1
 endable: false
@@ -93,7 +93,7 @@ scenarios:
         - *nginx
       functions:
         - !workloadFunction
-          values: "100000,1000000,10000000"
+          values: "100000,500000,1000000,5000000,10000000"
     metric:
       mongodb1 : &slave !virtualMachine
        id: 2
