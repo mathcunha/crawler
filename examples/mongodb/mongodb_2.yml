@@ -39,18 +39,31 @@ scriptlets:
    scripts:
      - "sudo ps -aux | grep mongo | awk '{print $2}'| xargs sudo kill -9; echo "
      - 'sudo rm -rf /data/configdb/; sudo rm -rf /data/db; echo '
-     - 'sudo mkdir -p /data/configdb/; sudo mkdir -p  /data/db; echo'
-     - 'sudo mongod --config /etc/mongodb/mongod.conf --bind_ip $HOSTNAME'
-     - 'sudo mongod --config /etc/mongodb/mongoc.conf --bind_ip $HOSTNAME'
-     - 'sudo mongos --configdb $HOSTNAME:27019 --config /etc/mongodb/mongos.conf --bind_ip $HOSTNAME'
+     - 'sudo mkdir -p /data/configdb/; sudo mkdir -p  /data/db; echo '
+     - 'sudo mongod --config /etc/mongodb/mongod.conf --bind_ip $HOSTNAME; echo '
+     - 'sudo mongod --config /etc/mongodb/mongoc.conf --bind_ip $HOSTNAME; echo '
+     - 'sudo mongos --configdb ${privateIpAddress}:27019 --config /etc/mongodb/mongos.conf --bind_ip $HOSTNAME; echo'
  - &start_mongodb !scriptlet
    id: 2
    scripts:
      - "sudo ps -aux | grep mongo | awk '{print $2}'| xargs sudo kill -9; echo "
      - 'sudo rm -rf /data/db; echo '
      - 'sudo mkdir -p  /data/db; echo '
-     - 'sudo mongod --config /etc/mongodb/mongod.conf --bind_ip $HOSTNAME'
-     - 'sudo mongos --configdb ${scenarioScope.metric(mongodb1).privateIpAddress}:27019 --config /etc/mongodb/mongos.conf --bind_ip $HOSTNAME'
+     - 'sudo mongod --config /etc/mongodb/mongod.conf --bind_ip $HOSTNAME; echo'
+     - 'sudo mongos --configdb ${scenarioScope.metric(mongodb1).privateIpAddress}:27019 --config /etc/mongodb/mongos.conf --bind_ip $HOSTNAME; echo '
+ - &execute !scriptlet
+   id: 3
+   scripts:
+     - 'sudo service nginx stop; echo '
+     - "sudo sed -i '/server .*\;/d' /usr/local/nginx/nginx.conf; echo "
+     - "sudo sed -i 's;\(least_conn\;\);\1\n        server ${scenarioScope.metric(mongodb1).privateIpAddress}:27018\;;g' /usr/local/nginx/nginx.conf; echo "
+     - "sudo sed -i 's;\(least_conn\;\);\1\n        server ${scenarioScope.metric(mongodb2).privateIpAddress}:27018\;;g' /usr/local/nginx/nginx.conf; echo "
+     - 'sudo service nginx start; echo '
+     - "mongo --eval 'sh.status()'"
+     - "mongo --eval 'sh.addShard("10.71.161.22:27017")'"
+     - "mongo --eval "sh.addShard('10.168.94.19:27017')""
+     - "mongo --eval 'sh.enableSharding("ycsb")'"
+     - "mongo --eval 'sh.shardCollection("ycsb.usertable", {_id:1})'"
 
 scenarios:
  !foreach
