@@ -60,10 +60,12 @@ scriptlets:
      - "sudo sed -i 's;\(least_conn\;\);\1\n        server ${scenarioScope.metric(mongodb2).privateIpAddress}:27018\;;g' /usr/local/nginx/nginx.conf; echo "
      - 'sudo service nginx start; echo '
      - "mongo --eval 'sh.status()'"
-     - "mongo --eval 'sh.addShard("10.71.161.22:27017")'"
-     - "mongo --eval "sh.addShard('10.168.94.19:27017')""
-     - "mongo --eval 'sh.enableSharding("ycsb")'"
-     - "mongo --eval 'sh.shardCollection("ycsb.usertable", {_id:1})'"
+     - "mongo --eval 'sh.addShard(\"${scenarioScope.metric(mongodb1).privateIpAddress}:27017\")'"
+     - "mongo --eval 'sh.addShard(\"${scenarioScope.metric(mongodb2).privateIpAddress}:27017\")'"
+     - "mongo --eval 'sh.enableSharding(\"ycsb\")'"
+     - "mongo --eval 'sh.shardCollection(\"ycsb.usertable\", {_id:1})'"
+     - "mongo --eval 'sh.status()'"
+     - "~/execute.sh ${scenarioScope.name} "
 
 scenarios:
  !foreach
@@ -82,7 +84,7 @@ scenarios:
           type: *c3_2xlarge
           name: crawler
           scripts:
-            submit_workload : *execute_wkl
+            submit_workload : *execute
       functions:
         - !workloadFunction
           values: "100000,200000"
