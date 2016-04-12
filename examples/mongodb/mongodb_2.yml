@@ -1,5 +1,5 @@
 !benchmark
-id: 1
+id: 2
 name: mongodb
 rounds: 1
 endable: false
@@ -38,8 +38,8 @@ scriptlets:
    id: 1
    scripts:
      - "sudo ps -aux | grep mongo | awk '{print $2}' | xargs sudo kill -9;"
-     - 'sudo rm -rf /data/configdb/; sudo rm -rf /data/db; echo '
-     - 'sudo mkdir -p /data/configdb/; sudo mkdir -p  /data/db; echo '
+     - 'sudo rm -rf /data/configdb/; sudo rm -rf /mnt/db; echo '
+     - 'sudo mkdir -p /data/configdb/; sudo mkdir -p  /mnt/db; echo '
      - 'sudo mongod --config /etc/mongodb/mongod.conf --bind_ip $HOSTNAME; echo '
      - 'sudo mongod --config /etc/mongodb/mongoc.conf --bind_ip $HOSTNAME; echo '
      - 'sudo mongos --configdb ${privateIpAddress}:27019 --config /etc/mongodb/mongos.conf --bind_ip $HOSTNAME; echo'
@@ -47,8 +47,8 @@ scriptlets:
    id: 2
    scripts:
      - "sudo ps -aux | grep mongo | awk '{print $2}' | xargs sudo kill -9;"
-     - 'sudo rm -rf /data/db; echo '
-     - 'sudo mkdir -p  /data/db; echo '
+     - 'sudo rm -rf /mnt/db; echo '
+     - 'sudo mkdir -p  /mnt/db; echo '
      - 'sudo mongod --config /etc/mongodb/mongod.conf --bind_ip $HOSTNAME; echo'
      - 'sudo mongos --configdb ${scenarioScope.metric(mongodb1).privateIpAddress}:27019 --config /etc/mongodb/mongos.conf --bind_ip $HOSTNAME; echo '
  - &execute !scriptlet
@@ -64,7 +64,10 @@ scriptlets:
      - 'mongo --eval "sh.addShard(\"${scenarioScope.metric(mongodb2).privateIpAddress}:27017\")"; echo '
      - 'mongo --eval "sh.enableSharding(\"ycsb\")"; echo '
      - 'mongo --eval "sh.shardCollection(\"ycsb.usertable\", {_id:1})"; echo '
+     - 'mongo --eval "sh.status()"; echo '
      - "~/execute.sh ${scenarioScope.name}"
+     - 'mongo --eval "sh.status()"; echo '
+     - 'mongo ycsb --eval "db.usertable.count()"; echo'
  - &nada !scriptlet
    id: 4
    scripts:
