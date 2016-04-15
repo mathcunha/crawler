@@ -92,7 +92,7 @@ scenarios:
   var: profile
   statement:
   - !scenario
-    name: 2_$[profile]
+    name: 4_$[profile]
     id: $[count]
     endable: false
     workload: &ycsb !workload
