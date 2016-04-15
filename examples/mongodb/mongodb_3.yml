@@ -118,7 +118,7 @@ scenarios:
         stop_metric : *nada
       mongodb3 : &slave !virtualMachine
        id: 4
-       providerId: us-east-1/i-cc66b24b
+       providerId: us-east-1/i-c59d4d42
        type: *$[profile]
        name: mongodb
        scripts:
